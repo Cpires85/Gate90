@@ -16,8 +16,6 @@
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .perspective-1000 { perspective: 1000px; }
         #flashcard { touch-action: none; transition-property: transform, opacity, border-color; }
-        
-        /* Cores de feedback ao arrastar o card */
         .card-drag-right { border-color: var(--green-main) !important; box-shadow: 0 0 20px rgba(88, 204, 2, 0.2); }
         .card-drag-left { border-color: var(--red-streak) !important; box-shadow: 0 0 20px rgba(255, 75, 75, 0.2); }
     </style>
@@ -29,6 +27,13 @@
         <div id="btn-reset" class="w-10 h-10 rounded-full border-2 border-gray-700 overflow-hidden bg-white active:scale-95 transition-transform" onclick="resetarApp()">
             <img src="151623.png" alt="Mascote" class="w-full h-full object-cover">
         </div>
+        
+        <!-- CRONÔMETRO DE 24H -->
+        <div class="flex flex-col items-center justify-center">
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Tempo Restante</span>
+            <span id="countdown-timer" class="text-sm font-mono font-bold text-orange-500 tracking-wider">--:--:--</span>
+        </div>
+
         <div class="flex items-center space-x-6 text-sm font-extrabold">
             <div class="flex items-center space-x-1 text-[var(--red-streak)]" onclick="abrirTelaOfensiva()">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 animate-pulse"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
@@ -55,22 +60,8 @@
             <button onclick="fecharTela('daily-menu')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         
-        <div class="flex-1 p-6 space-y-4 overflow-y-auto">
-            <button id="btn-ex1" onclick="iniciarExercicio('flashcards')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-[var(--blue-main)] p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></div>
-                    <div class="text-left"><h3 class="font-bold text-white">1. Cards com Áudio</h3><p class="text-xs text-gray-400">Treine a leitura e fala</p></div>
-                </div>
-                <div id="status-ex1" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
-            </button>
-
-            <button id="btn-ex2" onclick="iniciarExercicio('quiz')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-purple-500 p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
-                    <div class="text-left"><h3 class="font-bold text-white">2. Múltipla Escolha</h3><p class="text-xs text-gray-400">Qual o significado correto?</p></div>
-                </div>
-                <div id="status-ex2" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
-            </button>
+        <div class="flex-1 p-6 space-y-4 overflow-y-auto" id="menu-tasks-container">
+            <!-- Botões gerados pelo JS -->
         </div>
 
         <div class="p-6 border-t border-gray-800">
@@ -106,44 +97,38 @@
         </div>
     </div>
 
-    <!-- TELA: QUIZ -->
+    <!-- TELA: QUIZ / PROVA -->
     <div id="quiz-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
         <div class="p-4 flex justify-between items-center border-b border-gray-800">
             <button onclick="fecharTela('quiz-screen')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
             <div class="text-gray-400 font-bold" id="quiz-counter">1/10</div>
         </div>
         <div class="flex-1 p-6 flex flex-col overflow-y-auto">
-            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest text-center mt-2">Qual a tradução de:</h2>
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest text-center mt-2" id="quiz-tipo-titulo">Qual a tradução de:</h2>
             <h1 id="quiz-pergunta" class="text-2xl font-black text-[var(--blue-main)] text-center mt-4 mb-8 leading-tight">"..."</h1>
             <div id="quiz-opcoes" class="flex flex-col gap-4 pb-8"></div>
         </div>
     </div>
 
-    <!-- TELA: PROGRESSO / OFENSIVA (O Foguinho) -->
+    <!-- TELA: PROGRESSO / OFENSIVA -->
     <div id="streak-screen" class="fixed inset-0 bg-[#131F24] z-50 flex flex-col items-center justify-between py-12 px-4 transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
         <div class="w-full flex justify-end">
             <button onclick="fecharTela('streak-screen')" class="text-gray-400 p-2 bg-gray-800 rounded-full active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-        
         <div class="flex-1 flex flex-col items-center justify-center w-full">
             <div class="relative w-40 h-40 mb-2">
                 <svg viewBox="0 0 24 24" fill="var(--red-streak)" class="w-full h-full drop-shadow-2xl animate-pulse"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
                 <div class="absolute inset-0 flex items-center justify-center pt-8"><div class="w-12 h-12 bg-white rounded-full blur-md opacity-80"></div></div>
             </div>
-            
             <h1 id="streak-screen-count" class="text-7xl font-black text-[var(--red-streak)] tracking-tighter drop-shadow-lg">1</h1>
             <p class="text-2xl font-bold text-[var(--red-streak)] mt-2 mb-10">dias de ofensiva</p>
-            
-            <p class="text-gray-300 font-medium text-center text-sm px-8">O fogo apagará se você ficar<br>mais de 24 horas sem completar o dia.</p>
+            <p class="text-gray-300 font-medium text-center text-sm px-8">Complete as tarefas diárias<br>para manter a chama acesa!</p>
         </div>
     </div>
 
     <!-- NAVEGAÇÃO INFERIOR -->
     <nav class="fixed bottom-0 w-full bg-[#131F24] border-t-2 border-gray-800 flex justify-around items-center p-3 z-0 shrink-0">
-        <!-- Botão Trilha (Ativo) -->
         <button onclick="fecharTodasAsTelas()" class="text-[var(--green-main)] p-2 bg-[var(--green-main)]/10 rounded-xl active:scale-95 transition-transform"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-        
-        <!-- Botão Ofensiva / Fogo (Agora Funcional) -->
         <button onclick="abrirTelaOfensiva()" class="text-gray-500 hover:text-[var(--red-streak)] p-2 active:scale-95 transition-colors"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg></button>
     </nav>
 
@@ -152,11 +137,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ESTADO INICIAL DA INTERFACE
         let appState = { diaAtual: 1, tarefasFeitasHoje: { ex1: false, ex2: false }, last_study_date: null };
         let dbRef = null;
         let userRef = null;
 
+        // BANCO DE DADOS EXPANDIDO
         const vocabularioMaster = [
             { en: "A table for three, please.", pt: "Uma mesa para três, por favor.", pronuncia: "A tei-bôu fór tri, plíz.", wrong: ["Gostaria de pagar a conta.", "Onde fica o banheiro?"] },
             { en: "Here are our passports.", pt: "Aqui estão nossos passaportes.", pronuncia: "Hír ár aour pás-pórts.", wrong: ["Nós perdemos o voo.", "Aqui está minha bagagem."] },
@@ -167,10 +152,15 @@
             { en: "The air conditioning isn't working.", pt: "O ar-condicionado não está funcionando.", pronuncia: "Dâ ér con-dí-xio-nin í-zãnt uôr-kin.", wrong: ["A televisão quebrou.", "A porta não abre."] },
             { en: "Could you take a picture of us?", pt: "Você poderia tirar uma foto nossa?", pronuncia: "Cúd iú têik a pík-tshur óv âs?", wrong: ["Posso tirar uma foto do castelo?", "Quanto custa essa foto?"] },
             { en: "I have a reservation under Pires.", pt: "Eu tenho uma reserva no nome de Pires.", pronuncia: "Ái hév a re-zâr-vei-xâ-n ân-dâr Pí-ris.", wrong: ["Preciso de um quarto duplo.", "Quero cancelar minha viagem."] },
-            { en: "My daughter wants to see Cinderella.", pt: "Minha filha quer ver a Cinderela.", pronuncia: "Mái dór-târ uónts tú sí Sin-dê-ré-la.", wrong: ["Onde compramos os ingressos?", "Nós já tiramos foto ali."] }
+            { en: "My daughter wants to see Cinderella.", pt: "Minha filha quer ver a Cinderela.", pronuncia: "Mái dór-târ uónts tú sí Sin-dê-ré-la.", wrong: ["Onde compramos os ingressos?", "Nós já tiramos foto ali."] },
+            { en: "Can I have some tap water?", pt: "Você pode me dar água da torneira (grátis)?", pronuncia: "Kén ái hév sâm tép uó-târ?", wrong: ["Onde posso comprar água?", "A água está muito gelada."] },
+            { en: "What time is the parade?", pt: "A que horas é o desfile?", pronuncia: "Uát táim is dâ pâ-rêid?", wrong: ["Onde é o banheiro?", "Quanto custa o ingresso?"] },
+            { en: "Do you have this in a bigger size?", pt: "Você tem isso em um tamanho maior?", pronuncia: "Dú iú hév dês ín a bí-guâr sáiz?", wrong: ["Onde é o provador?", "Isso é muito caro."] },
+            { en: "Where is the ride-share pickup?", pt: "Onde é o ponto de Uber/aplicativo?", pronuncia: "Uér is dâ ráid-xér pí-kâp?", wrong: ["A que horas passa o ônibus?", "Como chamo um táxi?"] },
+            { en: "Is tax included?", pt: "O imposto já está incluído?", pronuncia: "Is téks in-clú-dêd?", wrong: ["Aceita cartão de crédito?", "Posso pagar em dinheiro?"] }
         ];
 
-        // 1. DESENHA A INTERFACE IMEDIATAMENTE
+        // 1. DESENHA A TRILHA 
         const trailContainer = document.getElementById('trail-container');
         function renderizarTrilha() {
             trailContainer.innerHTML = ''; 
@@ -180,23 +170,23 @@
             for (let i = 1; i <= 90; i++) {
                 const offsetX = posicoesX[(i - 1) % posicoesX.length];
                 let btnHtml = '', extra = '';
+                const isProva = (i % 4 === 0);
 
                 if (i < appState.diaAtual) {
                     btnHtml = `<button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></button>`;
                 } else if (i === appState.diaAtual) {
+                    const iconProva = isProva ? '⭐' : i;
                     btnHtml = `
                         <div class="relative z-10" id="dia-ativo">
-                            <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#37464F] text-[var(--green-main)] text-sm font-extrabold px-4 py-2 rounded-xl animate-bounce shadow-lg">Dia ${i}</div>
-                            <button onclick="abrirMenuDoDia()" class="w-[85px] h-[85px] rounded-full bg-[var(--green-main)] border-b-[8px] border-[var(--green-shadow)] text-white text-3xl font-black shadow-2xl active:translate-y-1 active:border-b-0">${i}</button>
-                            <div class="absolute top-0 w-[85px] h-[85px] rounded-full bg-[var(--green-main)] opacity-30 animate-ping -z-10"></div>
+                            <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#37464F] text-[var(--green-main)] text-sm font-extrabold px-4 py-2 rounded-xl animate-bounce shadow-lg whitespace-nowrap">${isProva ? 'Dia de Prova' : 'Dia ' + i}</div>
+                            <button onclick="abrirMenuDoDia()" class="w-[85px] h-[85px] rounded-full ${isProva ? 'bg-orange-500 border-orange-600' : 'bg-[var(--green-main)] border-[var(--green-shadow)]'} border-b-[8px] text-white text-3xl font-black shadow-2xl active:translate-y-1 active:border-b-0">${iconProva}</button>
+                            <div class="absolute top-0 w-[85px] h-[85px] rounded-full ${isProva ? 'bg-orange-500' : 'bg-[var(--green-main)]'} opacity-30 animate-ping -z-10"></div>
                         </div>`;
                 } else {
-                    btnHtml = `<button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] text-gray-500 font-black text-2xl">${i}</button>`;
-                    if (i % 20 === 0 && i >= appState.diaAtual) {
-                        extra = `<div class="absolute left-[60%] top-[-30px] flex items-end drop-shadow-xl z-10 w-48"><img src="151623.png" class="w-16 h-16 rounded-full border-2 border-gray-600 bg-white" alt="Mascote"><div class="bg-white text-gray-800 text-xs font-bold py-2 px-3 rounded-2xl rounded-bl-none ml-1 mb-6 shadow-md">Estou te esperando!</div></div>`;
-                    }
+                    const iconProva = isProva ? '<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z"/></svg>' : i;
+                    btnHtml = `<button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] text-gray-500 font-black text-2xl">${iconProva}</button>`;
                 }
-                trailContainer.insertAdjacentHTML('beforeend', `<div class="translate-x-[${offsetX}px] w-full flex justify-center relative my-2">${btnHtml}${extra}</div>`);
+                trailContainer.insertAdjacentHTML('beforeend', `<div class="translate-x-[${offsetX}px] w-full flex justify-center relative my-2">${btnHtml}</div>`);
             }
             setTimeout(() => { const el = document.getElementById('dia-ativo'); if(el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
         }
@@ -217,51 +207,69 @@
             const app = initializeApp(firebaseConfig);
             dbRef = getFirestore(app);
             userRef = doc(dbRef, 'users', 'admin');
-            
             carregarProgressoNuvem();
 
-        } catch (error) {
-            console.error("Erro Firebase offline:", error);
-        }
+        } catch (error) { console.error("Erro Firebase offline:", error); }
 
         async function carregarProgressoNuvem() {
             if(!userRef) return;
             try {
                 const snap = await getDoc(userRef);
                 if (snap.exists()) {
-                    appState = snap.data();
-                    if (appState.last_study_date) {
-                        const hoje = new Date();
-                        const ultimoAcesso = new Date(appState.last_study_date);
-                        hoje.setHours(0,0,0,0); ultimoAcesso.setHours(0,0,0,0);
-                        const diffDias = Math.ceil(Math.abs(hoje - ultimoAcesso) / (1000 * 60 * 60 * 24));
-                        
-                        if (diffDias > 1 && (!appState.tarefasFeitasHoje.ex1 || !appState.tarefasFeitasHoje.ex2)) {
-                            alert("Ofensiva perdida! Mais de 24h sem completar as tarefas. Voltando ao Dia 1.");
-                            appState.diaAtual = 1;
-                            appState.tarefasFeitasHoje = { ex1: false, ex2: false };
-                            await salvarProgressoNuvem();
-                        }
-                    }
+                    appState = Object.assign(appState, snap.data());
                 } else {
-                    appState.last_study_date = new Date().toISOString();
                     await setDoc(userRef, appState);
                 }
+                iniciarCronometro();
                 renderizarTrilha();
-            } catch(e) {
-                console.error("Erro ler nuvem:", e);
-            }
+            } catch(e) { console.error("Erro ler nuvem:", e); }
         }
 
         async function salvarProgressoNuvem() {
             if(!userRef) return;
             try {
-                appState.last_study_date = new Date().toISOString();
                 await setDoc(userRef, appState, { merge: true });
             } catch(e) { console.error(e); }
         }
 
-        // LÓGICA DE TELAS E CLIQUES
+        // 3. CRONÔMETRO DE 24 HORAS
+        let intervaloCronometro;
+        function iniciarCronometro() {
+            clearInterval(intervaloCronometro);
+            const display = document.getElementById('countdown-timer');
+            
+            if(appState.diaAtual === 1 && !appState.last_study_date) {
+                display.innerText = "24:00:00";
+                return;
+            }
+
+            intervaloCronometro = setInterval(() => {
+                if(!appState.last_study_date) return;
+                
+                const limite = new Date(appState.last_study_date).getTime() + (24 * 60 * 60 * 1000);
+                const agora = new Date().getTime();
+                const diff = limite - agora;
+
+                if (diff <= 0) {
+                    clearInterval(intervaloCronometro);
+                    if (appState.diaAtual > 1) {
+                        alert("TEMPO ESGOTADO! As 24 horas se passaram. Voltando ao Dia 1.");
+                        appState.diaAtual = 1;
+                        appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+                        appState.last_study_date = null;
+                        salvarProgressoNuvem();
+                        location.reload();
+                    }
+                } else {
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    display.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                }
+            }, 1000);
+        }
+
+        // 4. LÓGICA DE TELAS E CLIQUES
         window.abrirTelaOfensiva = () => {
             document.getElementById('streak-screen-count').innerText = appState.diaAtual;
             document.getElementById('streak-screen').classList.replace('translate-y-full', 'translate-y-0');
@@ -278,53 +286,109 @@
         };
 
         window.abrirMenuDoDia = () => {
-            document.getElementById('menu-title').innerText = `Tarefas: Dia ${appState.diaAtual}`;
-            atualizarBotoesMenu();
+            const isProva = (appState.diaAtual % 4 === 0);
+            document.getElementById('menu-title').innerText = isProva ? `Prova: Dia ${appState.diaAtual}` : `Tarefas: Dia ${appState.diaAtual}`;
+            
+            const container = document.getElementById('menu-tasks-container');
+            container.innerHTML = '';
+
+            if (isProva) {
+                container.innerHTML = `
+                    <button id="btn-ex1" onclick="iniciarExercicio('prova')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-orange-500 p-3 rounded-xl">⭐</div>
+                            <div class="text-left"><h3 class="font-bold text-white">Prova de Revisão (20)</h3><p class="text-xs text-gray-400">Teste seus conhecimentos</p></div>
+                        </div>
+                        <div id="status-ex1" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button id="btn-ex1" onclick="iniciarExercicio('flashcards')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-[var(--blue-main)] p-3 rounded-xl">🗣️</div>
+                            <div class="text-left"><h3 class="font-bold text-white">1. Cards com Áudio (10)</h3><p class="text-xs text-gray-400">Treine a leitura e fala</p></div>
+                        </div>
+                        <div id="status-ex1" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+                    </button>
+
+                    <button id="btn-ex2" onclick="iniciarExercicio('quiz')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-purple-500 p-3 rounded-xl">🧠</div>
+                            <div class="text-left"><h3 class="font-bold text-white">2. Múltipla Escolha (10)</h3><p class="text-xs text-gray-400">Qual o significado?</p></div>
+                        </div>
+                        <div id="status-ex2" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+                    </button>
+                `;
+            }
+
+            atualizarBotoesMenu(isProva);
+            
             document.getElementById('daily-menu').classList.replace('translate-y-full', 'translate-y-0');
             document.getElementById('daily-menu').classList.replace('opacity-0', 'opacity-100');
             document.getElementById('daily-menu').classList.replace('pointer-events-none', 'pointer-events-auto');
         };
 
-        function atualizarBotoesMenu() {
+        function atualizarBotoesMenu(isProva) {
             const btnEx1 = document.getElementById('btn-ex1'), statusEx1 = document.getElementById('status-ex1');
             if (appState.tarefasFeitasHoje.ex1) {
-                btnEx1.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--bg-dark)]'); btnEx1.style.opacity = '0.5';
-                statusEx1.innerHTML = `<svg class="w-8 h-8 text-[var(--green-main)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>`;
+                btnEx1.className = "w-full bg-[var(--bg-dark)] border-b-4 border-[#131F24] p-4 rounded-2xl flex items-center justify-between transition-all opacity-50";
+                statusEx1.innerHTML = `✔️`;
             }
-            const btnEx2 = document.getElementById('btn-ex2'), statusEx2 = document.getElementById('status-ex2');
-            if (appState.tarefasFeitasHoje.ex2) {
-                btnEx2.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--bg-dark)]'); btnEx2.style.opacity = '0.5';
-                statusEx2.innerHTML = `<svg class="w-8 h-8 text-[var(--green-main)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>`;
+            
+            if (!isProva) {
+                const btnEx2 = document.getElementById('btn-ex2'), statusEx2 = document.getElementById('status-ex2');
+                if (appState.tarefasFeitasHoje.ex2) {
+                    btnEx2.className = "w-full bg-[var(--bg-dark)] border-b-4 border-[#131F24] p-4 rounded-2xl flex items-center justify-between transition-all opacity-50";
+                    statusEx2.innerHTML = `✔️`;
+                }
             }
+
             const btnConcluir = document.getElementById('btn-concluir-dia');
-            if (appState.tarefasFeitasHoje.ex1 && appState.tarefasFeitasHoje.ex2) {
-                btnConcluir.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--green-main)]');
-                btnConcluir.classList.replace('border-[var(--gray-locked-shadow)]', 'border-[var(--green-shadow)]');
-                btnConcluir.classList.replace('text-gray-500', 'text-white');
-                btnConcluir.classList.remove('pointer-events-none');
+            const diaConcluido = isProva ? appState.tarefasFeitasHoje.ex1 : (appState.tarefasFeitasHoje.ex1 && appState.tarefasFeitasHoje.ex2);
+
+            if (diaConcluido) {
+                btnConcluir.className = "w-full bg-[var(--green-main)] text-white border-b-[6px] border-[var(--green-shadow)] rounded-2xl py-4 font-extrabold text-lg uppercase tracking-wider transition-all active:translate-y-1 active:border-b-0";
+            } else {
+                btnConcluir.className = "w-full bg-[var(--gray-locked)] text-gray-500 border-b-[6px] border-[var(--gray-locked-shadow)] rounded-2xl py-4 font-extrabold text-lg uppercase tracking-wider transition-all pointer-events-none";
             }
         }
 
         window.concluirDia = async () => {
             appState.diaAtual++;
             appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+            appState.last_study_date = new Date().toISOString(); 
+            
             await salvarProgressoNuvem();
+            iniciarCronometro(); 
+
             fecharTelaBase('daily-menu');
             renderizarTrilha();
             
-            // Recompensa: Mostra a tela de fogo quando conclui o dia!
             setTimeout(() => { window.abrirTelaOfensiva(); }, 400);
         };
 
-        // EXERCÍCIOS
-        let licaoAtual = [], indexAtual = 0; const totalItems = 10;
+        // 5. EXERCÍCIOS
+        let licaoAtual = [], indexAtual = 0, totalItems = 10;
+        
+        function gerarVocabularioDoDia(dia, qtd) {
+            const indexInicio = (dia * 5) % vocabularioMaster.length;
+            let misturado = [...vocabularioMaster].sort(() => Math.random() - 0.5);
+            let selecionado = [];
+            
+            for(let i=0; i<qtd; i++) {
+                selecionado.push(misturado[(indexInicio + i) % misturado.length]);
+            }
+            return selecionado;
+        }
+
         window.iniciarExercicio = (tipo) => {
             if (tipo === 'flashcards' && appState.tarefasFeitasHoje.ex1) return;
             if (tipo === 'quiz' && appState.tarefasFeitasHoje.ex2) return;
+            if (tipo === 'prova' && appState.tarefasFeitasHoje.ex1) return;
             
-            // Mistura as frases
-            licaoAtual = [...vocabularioMaster].sort(() => Math.random() - 0.5).slice(0, totalItems);
-            while(licaoAtual.length < totalItems) licaoAtual.push(vocabularioMaster[Math.floor(Math.random() * vocabularioMaster.length)]);
+            totalItems = (tipo === 'prova') ? 20 : 10;
+            licaoAtual = gerarVocabularioDoDia(appState.diaAtual, totalItems);
             indexAtual = 0;
             
             if (tipo === 'flashcards') {
@@ -333,8 +397,9 @@
                 document.getElementById('flashcard-screen').classList.replace('opacity-0', 'opacity-100');
                 document.getElementById('flashcard-screen').classList.replace('pointer-events-none', 'pointer-events-auto');
                 renderizarFlashcard();
-            } else if (tipo === 'quiz') {
+            } else if (tipo === 'quiz' || tipo === 'prova') {
                 fecharTelaBase('daily-menu');
+                document.getElementById('quiz-tipo-titulo').innerText = tipo === 'prova' ? "PROVA DE REVISÃO:" : "Qual a tradução de:";
                 document.getElementById('quiz-screen').classList.replace('translate-x-full', 'translate-x-0');
                 document.getElementById('quiz-screen').classList.replace('opacity-0', 'opacity-100');
                 document.getElementById('quiz-screen').classList.replace('pointer-events-none', 'pointer-events-auto');
@@ -342,7 +407,7 @@
             }
         };
 
-        // --- FÍSICA DO FLASHCARD REFINADA ---
+        // --- FLASHCARD ---
         let cardVirado = false, startX = 0, currentTranslate = 0, isDragging = false;
         const flashcard = document.getElementById('flashcard');
 
@@ -355,7 +420,6 @@
             document.getElementById('card-front').classList.remove('hidden');
             document.getElementById('card-back').classList.add('hidden');
             
-            // Reseta estilos físicos
             flashcard.style.transform = `translateX(0px) rotate(0deg)`;
             flashcard.classList.remove('card-drag-right', 'card-drag-left');
             cardVirado = false;
@@ -383,7 +447,6 @@
             currentTranslate = e.touches[0].clientX - startX; 
             flashcard.style.transform = `translateX(${currentTranslate}px) rotate(${currentTranslate * 0.05}deg)`; 
             
-            // Feedback visual de cores na borda durante o arraste
             if (currentTranslate > 60) {
                 flashcard.classList.add('card-drag-right');
                 flashcard.classList.remove('card-drag-left');
@@ -405,7 +468,6 @@
             } else if (currentTranslate < -90) {
                 window.processarCard('errei');
             } else {
-                // Voltar pro meio se não arrastou o suficiente
                 flashcard.style.transform = `translateX(0px) rotate(0deg)`;
                 flashcard.classList.remove('card-drag-right', 'card-drag-left');
             }
@@ -432,7 +494,7 @@
             }, 300);
         };
 
-        // --- QUIZ LAYOUT REFINADO ---
+        // --- QUIZ LAYOUT ---
         function renderizarQuiz() {
             document.getElementById('quiz-counter').innerText = `${indexAtual + 1}/${totalItems}`;
             const item = licaoAtual[indexAtual];
@@ -456,7 +518,6 @@
             todosBotoes.forEach(b => b.style.pointerEvents = 'none');
             
             if (isCorreta) {
-                // Estilo Duolingo de acerto
                 botao.classList.replace('bg-[#1A282F]', 'bg-[var(--green-main)]');
                 botao.classList.replace('border-gray-700', 'border-[var(--green-shadow)]');
                 botao.classList.replace('hover:border-gray-500', 'border-[var(--green-shadow)]');
@@ -464,7 +525,10 @@
                 setTimeout(async () => {
                     indexAtual++;
                     if (indexAtual >= totalItems) {
-                        appState.tarefasFeitasHoje.ex2 = true; 
+                        const isProva = (appState.diaAtual % 4 === 0);
+                        if (isProva) appState.tarefasFeitasHoje.ex1 = true;
+                        else appState.tarefasFeitasHoje.ex2 = true;
+                        
                         await salvarProgressoNuvem();
                         fecharTelaBase('quiz-screen'); 
                         window.abrirMenuDoDia();
@@ -473,7 +537,6 @@
                     }
                 }, 800);
             } else {
-                // Estilo de erro
                 botao.classList.replace('bg-[#1A282F]', 'bg-red-500');
                 botao.classList.replace('border-gray-700', 'border-red-700');
                 botao.classList.replace('hover:border-gray-500', 'border-red-700');
@@ -502,6 +565,7 @@
             if(confirm("Voltar para o Dia 1 e reiniciar progresso na nuvem?")) {
                 appState.diaAtual = 1; 
                 appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+                appState.last_study_date = null;
                 await salvarProgressoNuvem(); 
                 location.reload();
             }
