@@ -1,154 +1,210 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="light">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gate90</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            500: '#3b82f6', // Azul principal
-                            600: '#2563eb',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <link rel="manifest" href="manifest.json">
+    <style>
+        /* Cores exatas da interface de referência */
+        :root {
+            --bg-dark: #131F24;
+            --green-main: #58CC02;
+            --green-shadow: #46A302;
+            --blue-main: #1CB0F6;
+            --blue-shadow: #1899D6;
+            --red-streak: #FF4B4B;
+            --gray-locked: #37464F;
+            --gray-locked-shadow: #202F36;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300 min-h-screen flex flex-col">
+<body class="flex flex-col min-h-screen">
 
-    <!-- Cabeçalho (Header) -->
-    <header class="flex justify-between items-center p-4 bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
-        <!-- Perfil e Mascote -->
-        <div class="flex items-center space-x-3">
-            <img src="151623.png" alt="Mascote Cachorro Let's Learn English" class="w-12 h-12 rounded-full border-2 border-brand-500 object-cover bg-white shadow-sm[span_0](start_span)"[span_0](end_span)>
-            <div>
-                <h1 class="font-extrabold text-xl tracking-tight text-gray-900 dark:text-white">Gate90</h1>
-                <p class="text-xs font-medium text-brand-500">Próximo voo: MCO (Orlando)</p>
-            </div>
+    <!-- CABEÇALHO (Header de Estatísticas) -->
+    <header class="flex justify-between items-center p-4 sticky top-0 z-10 bg-[#131F24] border-b border-gray-800">
+        <!-- Mascote/Perfil -->
+        <div class="w-10 h-10 rounded-full border-2 border-gray-700 overflow-hidden bg-white">
+            <img src="151623.png" alt="Mascote" class="w-full h-full object-cover">
         </div>
-
-        <!-- Ofensiva e Modo Noturno -->
-        <div class="flex items-center space-x-4">
-            <!-- Foguinho (Streak) -->
-            <div class="flex items-center bg-orange-100 dark:bg-orange-900/30 px-3 py-1.5 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500 animate-pulse" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.281.43-.506.928-.712 1.415-.4.945-.733 1.942-1.258 2.812A11.026 11.026 0 006.12 11.45c-.244.604-.42 1.25-.333 1.905.109.827.603 1.54 1.343 1.834.78.309 1.696.113 2.23-.497a.998.998 0 00-.03-1.42 2.012 2.012 0 01-.643-1.077c-.1-.453.111-.884.453-1.121.397-.276.903-.32 1.336-.088.504.27 1.018.665 1.488 1.15.545.565 1.168 1.253 1.936 1.449.8.204 1.692-.124 2.193-.82.522-.724.582-1.743.208-2.61a10.985 10.985 0 00-1.92-3.115c-.482-.55-.992-1.083-1.433-1.636-.456-.57-.86-1.22-1.066-1.944a1 1 0 00-1.472-.51z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-bold text-orange-600 dark:text-orange-400 ml-1 text-sm">1</span>
+        
+        <!-- Status (Bandeira, Fogo, Cristais) -->
+        <div class="flex items-center space-x-6 text-sm font-extrabold">
+            <!-- Bandeira EUA / Nível -->
+            <div class="flex items-center space-x-2 text-white">
+                <span class="text-xl">🇺🇸</span>
+                <span>1</span>
             </div>
-
-            <!-- Botão de Modo Noturno -->
-            <button id="theme-toggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-600 dark:text-gray-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
+            <!-- Ofensiva -->
+            <div class="flex items-center space-x-1 text-[#FF4B4B]">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
+                <span>1</span>
+            </div>
+            <!-- Cristais/Gemas -->
+            <div class="flex items-center space-x-1 text-pink-400">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M12 2l3 9h9l-7.5 5.5 3 9-7.5-6-7.5 6 3-9L0 11h9z"/></svg>
+                <span>10</span>
+            </div>
         </div>
     </header>
 
-    <!-- Conteúdo Principal -->
-    <main class="flex-1 p-4 w-full max-w-md mx-auto flex flex-col gap-6">
+    <!-- TRILHA DE APRENDIZADO (Conteúdo Principal) -->
+    <main class="flex-1 overflow-y-auto pb-24 relative flex flex-col items-center">
         
-        <!-- Área do Flashcard Ativo -->
-        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center justify-center min-h-[220px] text-center relative overflow-hidden">
-            <div class="absolute top-3 left-3 text-xs font-semibold text-brand-500 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded-md">
-                Situação: Restaurante
+        <!-- Cabeçalho da Seção (Caixa Verde) -->
+        <div class="w-11/12 max-w-md mt-6 p-4 rounded-2xl bg-[var(--green-main)] flex justify-between items-center shadow-lg relative">
+            <div>
+                <p class="text-white/80 text-xs font-bold tracking-widest uppercase mb-1">Seção 1, Unidade 1</p>
+                <h2 class="text-white text-xl font-bold leading-tight">Sobrevivência no Aeroporto</h2>
             </div>
+            <button class="bg-white/20 p-2 rounded-xl">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+            </button>
+        </div>
+
+        <!-- Caminho (Nós em Zigue-Zague) -->
+        <div class="mt-8 flex flex-col items-center gap-4 w-full">
             
-            <!-- Frente do Cartão -->
-            <div id="card-front" class="mt-4">
-                <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Como você diz:</p>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">"Mesa para três, por favor."</h2>
+            <!-- Nó 1 (Concluído) -->
+            <div class="translate-x-[-30px]">
+                <button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white relative">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </button>
             </div>
 
-            <!-- Verso do Cartão (Oculto por padrão, será controlado via JS) -->
-            <div id="card-back" class="hidden mt-4">
-                <h2 class="text-2xl font-bold text-brand-600 dark:text-brand-400 mb-1">"Table for three, please."</h2>
-                <p class="text-gray-400 text-sm italic font-mono bg-gray-50 dark:bg-gray-900 px-3 py-1 rounded-lg">Tei-bôu fór tri, plíz.</p>
+            <!-- Nó 2 (Concluído) -->
+            <div class="translate-x-[20px]">
+                <button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white relative">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </button>
+            </div>
+
+            <!-- Nó 3 (ATIVO) -->
+            <div class="translate-x-[-10px] mt-6 relative" id="active-node">
+                <!-- Tooltip CONTINUAR flutuante -->
+                <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#37464F] border border-gray-600 text-[var(--green-main)] text-sm font-extrabold uppercase tracking-widest px-4 py-2 rounded-xl whitespace-nowrap animate-bounce shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent after:border-t-[#37464F]">
+                    Continuar
+                </div>
                 
-                <!-- Botões de Ação do SRS -->
-                <div class="flex gap-2 mt-6 w-full">
-                    <button class="flex-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 py-2 rounded-xl font-bold text-sm">Errei (Amanhã)</button>
-                    <button class="flex-1 bg-brand-500 text-white py-2 rounded-xl font-bold text-sm">Fácil (7 dias)</button>
+                <!-- Circulo Ativo -->
+                <button onclick="abrirTelaOfensiva()" class="w-[85px] h-[85px] rounded-full bg-[var(--green-main)] border-b-[8px] border-[var(--green-shadow)] flex items-center justify-center text-white relative ring-4 ring-white/10 shadow-2xl transition-transform active:translate-y-1 active:border-b-0">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </button>
+                
+                <!-- Circulo brilhante atrás -->
+                <div class="absolute inset-0 rounded-full bg-[var(--green-main)] opacity-30 animate-ping -z-10"></div>
+            </div>
+
+            <!-- Nó 4 (Bloqueado) -->
+            <div class="translate-x-[40px] mt-6">
+                <button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] flex items-center justify-center text-gray-500 relative">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                </button>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
+    <nav class="fixed bottom-0 w-full bg-[#131F24] border-t-2 border-gray-800 flex justify-around items-center p-3 pb-safe-area">
+        <button class="text-[var(--green-main)] flex flex-col items-center p-2 border-2 border-[var(--green-main)] bg-[var(--green-main)]/10 rounded-xl">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+        <button class="text-gray-500 hover:text-white transition">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        </button>
+        <button class="text-gray-500 hover:text-white transition">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
+        <button class="text-gray-500 hover:text-white transition">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </button>
+    </nav>
+
+
+    <!-- TELA DE COMEMORAÇÃO DA OFENSIVA (Modal em Tela Cheia) -->
+    <div id="streak-screen" class="fixed inset-0 bg-[#131F24] z-50 flex flex-col items-center justify-between py-12 px-4 transition-all duration-300 translate-y-full opacity-0 pointer-events-none">
+        
+        <div class="flex-1 flex flex-col items-center justify-center w-full">
+            <!-- Ícone Gigante do Fogo -->
+            <div class="relative w-40 h-40 mb-2">
+                <svg viewBox="0 0 24 24" fill="var(--red-streak)" class="w-full h-full drop-shadow-2xl">
+                    <path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/>
+                </svg>
+                <!-- Chama branca no meio -->
+                <div class="absolute inset-0 flex items-center justify-center pt-8">
+                    <div class="w-12 h-12 bg-white rounded-full blur-sm opacity-90"></div>
                 </div>
             </div>
 
-            <button id="flip-btn" class="mt-6 text-sm font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 underline decoration-dashed underline-offset-4">
-                Mostrar Resposta
-            </button>
-        </section>
+            <!-- Número e Texto da Ofensiva -->
+            <h1 class="text-7xl font-black text-[var(--red-streak)] tracking-tighter drop-shadow-lg">1</h1>
+            <p class="text-2xl font-bold text-[var(--red-streak)] mt-2 mb-10">dias de ofensiva</p>
 
-        <!-- Trilha de Tarefas Diárias -->
-        <section>
-            <div class="flex justify-between items-end mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Fila de Tarefas</h3>
-                <span class="text-xs text-gray-500">Hoje</span>
+            <!-- Calendário Semanal -->
+            <div class="flex justify-center items-center space-x-3 w-full mb-8">
+                <!-- Dia Marcado -->
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-[var(--red-streak)] font-bold mb-2">Sáb</span>
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-b from-[#FF9800] to-[var(--red-streak)] flex items-center justify-center text-white border-2 border-transparent ring-2 ring-[var(--red-streak)]">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                </div>
+                <!-- Dia Marcado (Hoje) -->
+                <div class="flex flex-col items-center relative">
+                    <span class="text-xs text-[var(--red-streak)] font-bold mb-2">Dom</span>
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-b from-[#FF9800] to-[var(--red-streak)] flex items-center justify-center text-white border-2 border-transparent ring-2 ring-[var(--red-streak)] shadow-[0_0_15px_rgba(255,75,75,0.6)]">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                </div>
+                <!-- Dias Vazios -->
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-gray-500 font-bold mb-2">Seg</span>
+                    <div class="w-11 h-11 rounded-full bg-[var(--gray-locked)]"></div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-gray-500 font-bold mb-2">Ter</span>
+                    <div class="w-11 h-11 rounded-full bg-[var(--gray-locked)]"></div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-xs text-gray-500 font-bold mb-2">Qua</span>
+                    <div class="w-11 h-11 rounded-full bg-[var(--gray-locked)]"></div>
+                </div>
             </div>
-            
-            <!-- Contêiner da lista (flex-col garante que os itens renderizados primeiro fiquem no topo) -->
-            <ul id="task-feed" class="flex flex-col gap-3">
-                <!-- Tarefa mais recente (Topo) -->
-                <li class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-l-4 border-l-brand-500 border-gray-100 dark:border-gray-700 flex items-start gap-3">
-                    <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
-                    <div>
-                        <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm">Treinar pedido de ingressos</p>
-                        <p class="text-xs text-gray-500 mt-1">Praticar: "Does my wife need to scan her ticket here?"</p>
-                    </div>
-                </li>
 
-                <!-- Tarefa anterior (Abaixo) -->
-                <li class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-l-4 border-l-orange-400 border-gray-100 dark:border-gray-700 flex items-start gap-3">
-                    <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
-                    <div>
-                        <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm">Encontro com Personagens</p>
-                        <p class="text-xs text-gray-500 mt-1">Revisar a frase da sua filha: "My daughter wants to see Cinderella."</p>
-                    </div>
-                </li>
-                
-                <!-- Tarefa mais antiga do dia (Fundo) -->
-                <li class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-l-4 border-l-gray-300 border-gray-100 dark:border-gray-700 flex items-start gap-3 opacity-60">
-                    <input type="checkbox" checked class="mt-1 w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
-                    <div>
-                        <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm line-through">Revisão de vocabulário de aeroporto</p>
-                        <p class="text-xs text-gray-500 mt-1">10 cards concluídos</p>
-                    </div>
-                </li>
-            </ul>
-        </section>
+            <p class="text-gray-300 font-medium text-center text-sm px-8">Isso que é arrasar na meta de aprendizado!<br>Não perca o ritmo!</p>
+        </div>
 
-    </main>
+        <!-- Botão VAI CPIRES -->
+        <button onclick="fecharTelaOfensiva()" class="w-full max-w-sm bg-[var(--blue-main)] border-b-[6px] border-[var(--blue-shadow)] rounded-2xl py-4 text-white font-extrabold text-lg uppercase tracking-wider active:translate-y-1 active:border-b-0 transition-all">
+            VAI, CPIRES85!
+        </button>
+    </div>
 
-    <!-- Script de Interações Básicas da Interface -->
+    <!-- Script para demonstrar a tela de fogo -->
     <script>
-        // Lógica do Modo Noturno
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
+        const telaOfensiva = document.getElementById('streak-screen');
 
-        themeToggleBtn.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark');
-        });
+        // Abre a tela imitando uma transição suave de baixo para cima
+        function abrirTelaOfensiva() {
+            telaOfensiva.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+            telaOfensiva.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        }
 
-        // Simulação do clique no Flashcard
-        const flipBtn = document.getElementById('flip-btn');
-        const cardFront = document.getElementById('card-front');
-        const cardBack = document.getElementById('card-back');
-
-        flipBtn.addEventListener('click', () => {
-            cardFront.classList.add('hidden');
-            cardBack.classList.remove('hidden');
-            flipBtn.classList.add('hidden');
-        });
+        // Fecha a tela ao clicar em "VAI, CPIRES85!"
+        function fecharTelaOfensiva() {
+            telaOfensiva.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+            telaOfensiva.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            
+            // Aqui futuramente será chamado a sua função que exibe os Flashcards (card-front/card-back)
+        }
     </script>
-
-        <!-- Script da Aplicação -->
-    <script type="module" src="app.js"></script>
 </body>
 </html>
