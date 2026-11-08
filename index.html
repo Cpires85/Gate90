@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gate90</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#3b82f6', // Azul principal
+                            600: '#2563eb',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Cabeçalho (Header) -->
+    <header class="flex justify-between items-center p-4 bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+        <!-- Perfil e Mascote -->
+        <div class="flex items-center space-x-3">
+            <img src="151623.png" alt="Mascote Cachorro Let's Learn English" class="w-12 h-12 rounded-full border-2 border-brand-500 object-cover bg-white shadow-sm[span_0](start_span)"[span_0](end_span)>
+            <div>
+                <h1 class="font-extrabold text-xl tracking-tight text-gray-900 dark:text-white">Gate90</h1>
+                <p class="text-xs font-medium text-brand-500">Próximo voo: MCO (Orlando)</p>
+            </div>
+        </div>
+
+        <!-- Ofensiva e Modo Noturno -->
+        <div class="flex items-center space-x-4">
+            <!-- Foguinho (Streak) -->
+            <div class="flex items-center bg-orange-100 dark:bg-orange-900/30 px-3 py-1.5 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500 animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.281.43-.506.928-.712 1.415-.4.945-.733 1.942-1.258 2.812A11.026 11.026 0 006.12 11.45c-.244.604-.42 1.25-.333 1.905.109.827.603 1.54 1.343 1.834.78.309 1.696.113 2.23-.497a.998.998 0 00-.03-1.42 2.012 2.012 0 01-.643-1.077c-.1-.453.111-.884.453-1.121.397-.276.903-.32 1.336-.088.504.27 1.018.665 1.488 1.15.545.565 1.168 1.253 1.936 1.449.8.204 1.692-.124 2.193-.82.522-.724.582-1.743.208-2.61a10.985 10.985 0 00-1.92-3.115c-.482-.55-.992-1.083-1.433-1.636-.456-.57-.86-1.22-1.066-1.944a1 1 0 00-1.472-.51z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-bold text-orange-600 dark:text-orange-400 ml-1 text-sm">1</span>
+            </div>
+
+            <!-- Botão de Modo Noturno -->
+            <button id="theme-toggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-600 dark:text-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 p-4 w-full max-w-md mx-auto flex flex-col gap-6">
+        
+        <!-- Área do Flashcard Ativo -->
+        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center justify-center min-h-[220px] text-center relative overflow-hidden">
+            <div class="absolute top-3 left-3 text-xs font-semibold text-brand-500 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded-md">
+                Situação: Restaurante
+            </div>
+            
+            <!-- Frente do Cartão -->
+            <div id="card-front" class="mt-4">
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Como você diz:</p>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">"Mesa para três, por favor."</h2>
+            </div>
+
+            <!-- Verso do Cartão (Oculto por padrão, será controlado via JS) -->
+            <div id="card-back" class="hidden mt-4">
+                <h2 class="text-2xl font-bold text-brand-600 dark:text-brand-400 mb-1">"Table for three, please."</h2>
+                <p class="text-gray-400 text-sm italic font-mono bg-gray-50 dark:bg-gray-900 px-3 py-1 rounded-lg">Tei-bôu fór tri, plíz.</p>
+                
+                <!-- Botões de Ação do SRS -->
+                <div class="flex gap-2 mt-6 w-full">
+                    <button class="flex-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 py-2 rounded-xl font-bold text-sm">Errei (Amanhã)</button>
+                    <button class="flex-1 bg-brand-500 text-white py-2 rounded-xl font-bold text-sm">Fácil (7 dias)</button>
+                </div>
+            </div>
+
+            <button id="flip-btn" class="mt-6 text-sm font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 underline decoration-dashed underline-offset-4">
+                Mostrar Resposta
+            </button>
+        </section>
+
+        <!-- Trilha de Tarefas Diárias -->
+        <section>
+            <div class="flex justify-between items-end mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Fila de Tarefas</h3>
+                <span class="text-xs text-gray-500">Hoje</span>
+            </div>
+            
+            <!-- Contêiner da lista (flex-col garante que os itens renderizados primeiro fiquem no topo) -->
+            <ul id="task-feed" class="flex flex-col gap-3">
+                <!-- Tarefa mais recente (Topo) -->
+                <li class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-l-4 border-l-brand-500 border-gray-100 dark:border-gray-700 flex items-start gap-3">
+                    <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+                    <div>
+                        <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm">Treinar pedido de ingressos</p>
+                        <p class="text-xs text-gray-500 mt-1">Praticar: "Does my wife need to scan her ticket here?"</p>
+                    </div>
+                </li>
+
+                <!-- Tarefa anterior (Abaixo) -->
+                <li class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-l-4 border-l-orange-400 border-gray-100 dark:border-gray-700 flex items-start gap-3">
+                    <input type="checkbox" class="mt-1 w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+                    <div>
+                        <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm">Encontro com Personagens</p>
+                        <p class="text-xs text-gray-500 mt-1">Revisar a frase da sua filha: "My daughter wants to see Cinderella."</p>
+                    </div>
+                </li>
+                
+                <!-- Tarefa mais antiga do dia (Fundo) -->
+                <li class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-l-4 border-l-gray-300 border-gray-100 dark:border-gray-700 flex items-start gap-3 opacity-60">
+                    <input type="checkbox" checked class="mt-1 w-5 h-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+                    <div>
+                        <p class="font-semibold text-gray-800 dark:text-gray-100 text-sm line-through">Revisão de vocabulário de aeroporto</p>
+                        <p class="text-xs text-gray-500 mt-1">10 cards concluídos</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- Script de Interações Básicas da Interface -->
+    <script>
+        // Lógica do Modo Noturno
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+        });
+
+        // Simulação do clique no Flashcard
+        const flipBtn = document.getElementById('flip-btn');
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+
+        flipBtn.addEventListener('click', () => {
+            cardFront.classList.add('hidden');
+            cardBack.classList.remove('hidden');
+            flipBtn.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
