@@ -15,7 +15,11 @@
         body { background-color: var(--bg-dark); color: white; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .perspective-1000 { perspective: 1000px; }
-        #flashcard { touch-action: none; } 
+        #flashcard { touch-action: none; transition-property: transform, opacity, border-color; }
+        
+        /* Cores de feedback ao arrastar o card */
+        .card-drag-right { border-color: var(--green-main) !important; box-shadow: 0 0 20px rgba(88, 204, 2, 0.2); }
+        .card-drag-left { border-color: var(--red-streak) !important; box-shadow: 0 0 20px rgba(255, 75, 75, 0.2); }
     </style>
 </head>
 <body class="flex flex-col h-screen relative overflow-hidden">
@@ -26,8 +30,8 @@
             <img src="151623.png" alt="Mascote" class="w-full h-full object-cover">
         </div>
         <div class="flex items-center space-x-6 text-sm font-extrabold">
-            <div class="flex items-center space-x-1 text-[var(--red-streak)]">
-                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
+            <div class="flex items-center space-x-1 text-[var(--red-streak)]" onclick="abrirTelaOfensiva()">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 animate-pulse"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
                 <span id="streak-counter">1</span>
             </div>
         </div>
@@ -45,17 +49,17 @@
     </main>
 
     <!-- MENU DO DIA -->
-    <div id="daily-menu" class="fixed inset-0 bg-[#131F24] z-30 flex flex-col transition-transform duration-300 translate-y-full opacity-0">
+    <div id="daily-menu" class="fixed inset-0 bg-[#131F24] z-30 flex flex-col transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
         <div class="p-6 flex justify-between items-center border-b border-gray-800">
             <h2 id="menu-title" class="text-2xl font-bold text-white">Tarefas: Dia X</h2>
-            <button onclick="fecharTela('daily-menu')" class="text-gray-400 p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            <button onclick="fecharTela('daily-menu')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         
         <div class="flex-1 p-6 space-y-4 overflow-y-auto">
             <button id="btn-ex1" onclick="iniciarExercicio('flashcards')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
                 <div class="flex items-center space-x-4">
                     <div class="bg-[var(--blue-main)] p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></div>
-                    <div class="text-left"><h3 class="font-bold text-white">1. Cards com Áudio (10)</h3><p class="text-xs text-gray-400">Treine a leitura e fala</p></div>
+                    <div class="text-left"><h3 class="font-bold text-white">1. Cards com Áudio</h3><p class="text-xs text-gray-400">Treine a leitura e fala</p></div>
                 </div>
                 <div id="status-ex1" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
             </button>
@@ -63,7 +67,7 @@
             <button id="btn-ex2" onclick="iniciarExercicio('quiz')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
                 <div class="flex items-center space-x-4">
                     <div class="bg-purple-500 p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
-                    <div class="text-left"><h3 class="font-bold text-white">2. Múltipla Escolha (10)</h3><p class="text-xs text-gray-400">Qual o significado correto?</p></div>
+                    <div class="text-left"><h3 class="font-bold text-white">2. Múltipla Escolha</h3><p class="text-xs text-gray-400">Qual o significado correto?</p></div>
                 </div>
                 <div id="status-ex2" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
             </button>
@@ -77,17 +81,17 @@
     </div>
 
     <!-- TELA: FLASHCARDS -->
-    <div id="flashcard-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0">
+    <div id="flashcard-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
         <div class="p-4 flex justify-between items-center border-b border-gray-800">
-            <button onclick="fecharTela('flashcard-screen')" class="text-gray-400 p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+            <button onclick="fecharTela('flashcard-screen')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
             <div class="text-gray-400 font-bold" id="fc-counter">1/10</div>
         </div>
         <div class="flex-1 flex items-center justify-center p-6 w-full relative perspective-1000 overflow-hidden">
-            <div id="flashcard" class="w-full max-w-sm h-[400px] bg-[var(--gray-locked)] rounded-3xl shadow-2xl border border-gray-700 p-6 flex flex-col items-center justify-center text-center transition-transform duration-200 cursor-grab relative">
+            <div id="flashcard" class="w-full max-w-sm h-[400px] bg-[var(--gray-locked)] rounded-3xl shadow-2xl border-4 border-transparent p-6 flex flex-col items-center justify-center text-center transition-transform duration-200 cursor-grab relative">
                 <div id="card-front" class="w-full h-full flex flex-col items-center justify-center">
                     <p class="text-gray-400 text-sm mb-4 uppercase tracking-widest font-bold">Como você diria?</p>
                     <h2 id="fc-frente" class="text-2xl font-bold text-white leading-tight">...</h2>
-                    <button class="mt-8 bg-[var(--blue-main)] text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest shadow-lg animate-pulse" onclick="virarCard()">Revelar Resposta</button>
+                    <button class="mt-8 bg-[var(--blue-main)] text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest shadow-lg animate-pulse active:scale-95 transition-transform" onclick="virarCard()">Revelar Resposta</button>
                 </div>
                 <div id="card-back" class="w-full h-full flex flex-col items-center justify-center hidden">
                     <h2 id="fc-verso" class="text-3xl font-black text-[var(--green-main)] mb-4">...</h2>
@@ -103,22 +107,44 @@
     </div>
 
     <!-- TELA: QUIZ -->
-    <div id="quiz-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0">
+    <div id="quiz-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
         <div class="p-4 flex justify-between items-center border-b border-gray-800">
-            <button onclick="fecharTela('quiz-screen')" class="text-gray-400 p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+            <button onclick="fecharTela('quiz-screen')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
             <div class="text-gray-400 font-bold" id="quiz-counter">1/10</div>
         </div>
         <div class="flex-1 p-6 flex flex-col overflow-y-auto">
             <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest text-center mt-2">Qual a tradução de:</h2>
-            <h1 id="quiz-pergunta" class="text-2xl font-black text-[var(--green-main)] text-center mt-4 mb-8 leading-tight">"..."</h1>
+            <h1 id="quiz-pergunta" class="text-2xl font-black text-[var(--blue-main)] text-center mt-4 mb-8 leading-tight">"..."</h1>
             <div id="quiz-opcoes" class="flex flex-col gap-4 pb-8"></div>
+        </div>
+    </div>
+
+    <!-- TELA: PROGRESSO / OFENSIVA (O Foguinho) -->
+    <div id="streak-screen" class="fixed inset-0 bg-[#131F24] z-50 flex flex-col items-center justify-between py-12 px-4 transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
+        <div class="w-full flex justify-end">
+            <button onclick="fecharTela('streak-screen')" class="text-gray-400 p-2 bg-gray-800 rounded-full active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center justify-center w-full">
+            <div class="relative w-40 h-40 mb-2">
+                <svg viewBox="0 0 24 24" fill="var(--red-streak)" class="w-full h-full drop-shadow-2xl animate-pulse"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
+                <div class="absolute inset-0 flex items-center justify-center pt-8"><div class="w-12 h-12 bg-white rounded-full blur-md opacity-80"></div></div>
+            </div>
+            
+            <h1 id="streak-screen-count" class="text-7xl font-black text-[var(--red-streak)] tracking-tighter drop-shadow-lg">1</h1>
+            <p class="text-2xl font-bold text-[var(--red-streak)] mt-2 mb-10">dias de ofensiva</p>
+            
+            <p class="text-gray-300 font-medium text-center text-sm px-8">O fogo apagará se você ficar<br>mais de 24 horas sem completar o dia.</p>
         </div>
     </div>
 
     <!-- NAVEGAÇÃO INFERIOR -->
     <nav class="fixed bottom-0 w-full bg-[#131F24] border-t-2 border-gray-800 flex justify-around items-center p-3 z-0 shrink-0">
-        <button class="text-[var(--green-main)] p-2 bg-[var(--green-main)]/10 rounded-xl"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-        <button class="text-gray-500"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></button>
+        <!-- Botão Trilha (Ativo) -->
+        <button onclick="fecharTodasAsTelas()" class="text-[var(--green-main)] p-2 bg-[var(--green-main)]/10 rounded-xl active:scale-95 transition-transform"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+        
+        <!-- Botão Ofensiva / Fogo (Agora Funcional) -->
+        <button onclick="abrirTelaOfensiva()" class="text-gray-500 hover:text-[var(--red-streak)] p-2 active:scale-95 transition-colors"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg></button>
     </nav>
 
     <!-- MOTOR JAVASCRIPT & FIREBASE -->
@@ -149,6 +175,7 @@
         function renderizarTrilha() {
             trailContainer.innerHTML = ''; 
             document.getElementById('streak-counter').textContent = appState.diaAtual;
+            
             const posicoesX = [-30, 20, -15, 35];
             for (let i = 1; i <= 90; i++) {
                 const offsetX = posicoesX[(i - 1) % posicoesX.length];
@@ -166,7 +193,7 @@
                 } else {
                     btnHtml = `<button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] text-gray-500 font-black text-2xl">${i}</button>`;
                     if (i % 20 === 0 && i >= appState.diaAtual) {
-                        extra = `<div class="absolute left-[60%] top-[-30px] flex items-end drop-shadow-xl z-10 w-48"><img src="151623.png" class="w-16 h-16 rounded-full border-2 border-gray-600 bg-white" alt="Mascote"><div class="bg-white text-gray-800 text-xs font-bold py-2 px-3 rounded-2xl rounded-bl-none ml-1 mb-6">Estou te esperando!</div></div>`;
+                        extra = `<div class="absolute left-[60%] top-[-30px] flex items-end drop-shadow-xl z-10 w-48"><img src="151623.png" class="w-16 h-16 rounded-full border-2 border-gray-600 bg-white" alt="Mascote"><div class="bg-white text-gray-800 text-xs font-bold py-2 px-3 rounded-2xl rounded-bl-none ml-1 mb-6 shadow-md">Estou te esperando!</div></div>`;
                     }
                 }
                 trailContainer.insertAdjacentHTML('beforeend', `<div class="translate-x-[${offsetX}px] w-full flex justify-center relative my-2">${btnHtml}${extra}</div>`);
@@ -194,8 +221,7 @@
             carregarProgressoNuvem();
 
         } catch (error) {
-            console.error("Erro ao configurar Firebase:", error);
-            alert("Atenção: Houve um erro de ligação ao Firebase. A aplicação funcionará em modo offline.");
+            console.error("Erro Firebase offline:", error);
         }
 
         async function carregarProgressoNuvem() {
@@ -223,7 +249,7 @@
                 }
                 renderizarTrilha();
             } catch(e) {
-                console.error("Erro ao ler da nuvem:", e);
+                console.error("Erro ler nuvem:", e);
             }
         }
 
@@ -235,12 +261,28 @@
             } catch(e) { console.error(e); }
         }
 
-        // LÓGICA DE EXERCÍCIOS E CLIQUES
+        // LÓGICA DE TELAS E CLIQUES
+        window.abrirTelaOfensiva = () => {
+            document.getElementById('streak-screen-count').innerText = appState.diaAtual;
+            document.getElementById('streak-screen').classList.replace('translate-y-full', 'translate-y-0');
+            document.getElementById('streak-screen').classList.replace('opacity-0', 'opacity-100');
+            document.getElementById('streak-screen').classList.replace('pointer-events-none', 'pointer-events-auto');
+        };
+
+        window.fecharTodasAsTelas = () => {
+            fecharTelaBase('daily-menu');
+            fecharTelaBase('flashcard-screen');
+            fecharTelaBase('quiz-screen');
+            fecharTelaBase('streak-screen');
+            setTimeout(() => { const el = document.getElementById('dia-ativo'); if(el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 100);
+        };
+
         window.abrirMenuDoDia = () => {
             document.getElementById('menu-title').innerText = `Tarefas: Dia ${appState.diaAtual}`;
             atualizarBotoesMenu();
             document.getElementById('daily-menu').classList.replace('translate-y-full', 'translate-y-0');
             document.getElementById('daily-menu').classList.replace('opacity-0', 'opacity-100');
+            document.getElementById('daily-menu').classList.replace('pointer-events-none', 'pointer-events-auto');
         };
 
         function atualizarBotoesMenu() {
@@ -269,28 +311,38 @@
             await salvarProgressoNuvem();
             fecharTelaBase('daily-menu');
             renderizarTrilha();
+            
+            // Recompensa: Mostra a tela de fogo quando conclui o dia!
+            setTimeout(() => { window.abrirTelaOfensiva(); }, 400);
         };
 
+        // EXERCÍCIOS
         let licaoAtual = [], indexAtual = 0; const totalItems = 10;
         window.iniciarExercicio = (tipo) => {
             if (tipo === 'flashcards' && appState.tarefasFeitasHoje.ex1) return;
             if (tipo === 'quiz' && appState.tarefasFeitasHoje.ex2) return;
+            
+            // Mistura as frases
             licaoAtual = [...vocabularioMaster].sort(() => Math.random() - 0.5).slice(0, totalItems);
             while(licaoAtual.length < totalItems) licaoAtual.push(vocabularioMaster[Math.floor(Math.random() * vocabularioMaster.length)]);
             indexAtual = 0;
+            
             if (tipo === 'flashcards') {
                 fecharTelaBase('daily-menu');
                 document.getElementById('flashcard-screen').classList.replace('translate-x-full', 'translate-x-0');
                 document.getElementById('flashcard-screen').classList.replace('opacity-0', 'opacity-100');
+                document.getElementById('flashcard-screen').classList.replace('pointer-events-none', 'pointer-events-auto');
                 renderizarFlashcard();
             } else if (tipo === 'quiz') {
                 fecharTelaBase('daily-menu');
                 document.getElementById('quiz-screen').classList.replace('translate-x-full', 'translate-x-0');
                 document.getElementById('quiz-screen').classList.replace('opacity-0', 'opacity-100');
+                document.getElementById('quiz-screen').classList.replace('pointer-events-none', 'pointer-events-auto');
                 renderizarQuiz();
             }
         };
 
+        // --- FÍSICA DO FLASHCARD REFINADA ---
         let cardVirado = false, startX = 0, currentTranslate = 0, isDragging = false;
         const flashcard = document.getElementById('flashcard');
 
@@ -299,8 +351,13 @@
             document.getElementById('fc-frente').innerText = licaoAtual[indexAtual].pt;
             document.getElementById('fc-verso').innerText = `"${licaoAtual[indexAtual].en}"`;
             document.getElementById('fc-pronuncia').innerText = licaoAtual[indexAtual].pronuncia;
+            
             document.getElementById('card-front').classList.remove('hidden');
             document.getElementById('card-back').classList.add('hidden');
+            
+            // Reseta estilos físicos
+            flashcard.style.transform = `translateX(0px) rotate(0deg)`;
+            flashcard.classList.remove('card-drag-right', 'card-drag-left');
             cardVirado = false;
         }
 
@@ -314,40 +371,82 @@
             }
         };
 
-        flashcard.addEventListener('touchstart', (e) => { if (!cardVirado) return; startX = e.touches[0].clientX; isDragging = true; flashcard.style.transition = 'none'; });
-        flashcard.addEventListener('touchmove', (e) => { if (!isDragging || !cardVirado) return; currentTranslate = e.touches[0].clientX - startX; flashcard.style.transform = `translateX(${currentTranslate}px) rotate(${currentTranslate * 0.05}deg)`; });
+        flashcard.addEventListener('touchstart', (e) => { 
+            if (!cardVirado) return; 
+            startX = e.touches[0].clientX; 
+            isDragging = true; 
+            flashcard.style.transition = 'none'; 
+        });
+
+        flashcard.addEventListener('touchmove', (e) => { 
+            if (!isDragging || !cardVirado) return; 
+            currentTranslate = e.touches[0].clientX - startX; 
+            flashcard.style.transform = `translateX(${currentTranslate}px) rotate(${currentTranslate * 0.05}deg)`; 
+            
+            // Feedback visual de cores na borda durante o arraste
+            if (currentTranslate > 60) {
+                flashcard.classList.add('card-drag-right');
+                flashcard.classList.remove('card-drag-left');
+            } else if (currentTranslate < -60) {
+                flashcard.classList.add('card-drag-left');
+                flashcard.classList.remove('card-drag-right');
+            } else {
+                flashcard.classList.remove('card-drag-right', 'card-drag-left');
+            }
+        });
+
         flashcard.addEventListener('touchend', () => {
-            if (!isDragging || !cardVirado) return; isDragging = false; flashcard.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-            if (currentTranslate > 100) window.processarCard('facil');
-            else if (currentTranslate < -100) window.processarCard('errei');
-            else flashcard.style.transform = `translateX(0px) rotate(0deg)`;
+            if (!isDragging || !cardVirado) return; 
+            isDragging = false; 
+            flashcard.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease-out';
+            
+            if (currentTranslate > 90) {
+                window.processarCard('facil');
+            } else if (currentTranslate < -90) {
+                window.processarCard('errei');
+            } else {
+                // Voltar pro meio se não arrastou o suficiente
+                flashcard.style.transform = `translateX(0px) rotate(0deg)`;
+                flashcard.classList.remove('card-drag-right', 'card-drag-left');
+            }
         });
 
         window.processarCard = async (acao) => {
-            if(acao === 'facil') flashcard.style.transform = `translateX(500px) rotate(30deg)`;
-            else flashcard.style.transform = `translateX(-500px) rotate(-30deg)`;
+            if(acao === 'facil') flashcard.style.transform = `translateX(400px) rotate(20deg)`;
+            else flashcard.style.transform = `translateX(-400px) rotate(-20deg)`;
+            
             flashcard.style.opacity = '0';
+            flashcard.classList.remove('card-drag-right', 'card-drag-left');
+            
             setTimeout(async () => {
                 indexAtual++;
                 if (indexAtual >= totalItems) {
-                    appState.tarefasFeitasHoje.ex1 = true; await salvarProgressoNuvem();
-                    fecharTelaBase('flashcard-screen'); window.abrirMenuDoDia();
-                } else renderizarFlashcard();
-                flashcard.style.transform = `translateX(0px) rotate(0deg)`; flashcard.style.opacity = '1';
+                    appState.tarefasFeitasHoje.ex1 = true; 
+                    await salvarProgressoNuvem();
+                    fecharTelaBase('flashcard-screen'); 
+                    window.abrirMenuDoDia();
+                } else {
+                    renderizarFlashcard();
+                    flashcard.style.opacity = '1';
+                }
             }, 300);
         };
 
+        // --- QUIZ LAYOUT REFINADO ---
         function renderizarQuiz() {
             document.getElementById('quiz-counter').innerText = `${indexAtual + 1}/${totalItems}`;
             const item = licaoAtual[indexAtual];
             document.getElementById('quiz-pergunta').innerText = `"${item.en}"`;
+            
             let opcoes = [item.pt, item.wrong[0], item.wrong[1]].sort(() => Math.random() - 0.5);
             const container = document.getElementById('quiz-opcoes'); container.innerHTML = '';
+            
             opcoes.forEach(opcao => {
                 const isCorreta = opcao === item.pt;
                 const btn = document.createElement('button');
-                btn.className = "w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-5 rounded-2xl text-white font-bold text-lg active:translate-y-1 active:border-b-0 transition-all text-left shadow-md";
-                btn.innerText = opcao; btn.onclick = () => processarRespostaQuiz(btn, isCorreta);
+                btn.className = "w-full bg-[#1A282F] border-2 border-gray-700 hover:border-gray-500 p-5 rounded-2xl text-white font-semibold text-lg active:scale-95 transition-all text-left shadow-sm";
+                btn.innerText = opcao; 
+                btn.onclick = () => processarRespostaQuiz(btn, isCorreta);
                 container.appendChild(btn);
             });
         }
@@ -355,39 +454,56 @@
         async function processarRespostaQuiz(botao, isCorreta) {
             const todosBotoes = document.getElementById('quiz-opcoes').querySelectorAll('button');
             todosBotoes.forEach(b => b.style.pointerEvents = 'none');
+            
             if (isCorreta) {
-                botao.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--green-main)]');
-                botao.classList.replace('border-[var(--gray-locked-shadow)]', 'border-[var(--green-shadow)]');
+                // Estilo Duolingo de acerto
+                botao.classList.replace('bg-[#1A282F]', 'bg-[var(--green-main)]');
+                botao.classList.replace('border-gray-700', 'border-[var(--green-shadow)]');
+                botao.classList.replace('hover:border-gray-500', 'border-[var(--green-shadow)]');
+                
                 setTimeout(async () => {
                     indexAtual++;
                     if (indexAtual >= totalItems) {
-                        appState.tarefasFeitasHoje.ex2 = true; await salvarProgressoNuvem();
-                        fecharTelaBase('quiz-screen'); window.abrirMenuDoDia();
-                    } else renderizarQuiz();
-                }, 1000);
+                        appState.tarefasFeitasHoje.ex2 = true; 
+                        await salvarProgressoNuvem();
+                        fecharTelaBase('quiz-screen'); 
+                        window.abrirMenuDoDia();
+                    } else {
+                        renderizarQuiz();
+                    }
+                }, 800);
             } else {
-                botao.classList.replace('bg-[var(--gray-locked)]', 'bg-red-500');
-                botao.classList.replace('border-[var(--gray-locked-shadow)]', 'border-red-700');
+                // Estilo de erro
+                botao.classList.replace('bg-[#1A282F]', 'bg-red-500');
+                botao.classList.replace('border-gray-700', 'border-red-700');
+                botao.classList.replace('hover:border-gray-500', 'border-red-700');
+                
                 setTimeout(() => {
-                    botao.classList.replace('bg-red-500', 'bg-[var(--gray-locked)]');
-                    botao.classList.replace('border-red-700', 'border-[var(--gray-locked-shadow)]');
+                    botao.classList.replace('bg-red-500', 'bg-[#1A282F]');
+                    botao.classList.replace('border-red-700', 'border-gray-700');
+                    botao.classList.replace('border-red-700', 'hover:border-gray-500');
                     todosBotoes.forEach(b => b.style.pointerEvents = 'auto');
                 }, 1000);
             }
         }
 
+        // UTILITÁRIOS
         window.fecharTela = (id) => fecharTelaBase(id);
+        
         function fecharTelaBase(id) {
             const el = document.getElementById(id);
             if(el.classList.contains('translate-y-0')) el.classList.replace('translate-y-0', 'translate-y-full');
             else el.classList.replace('translate-x-0', 'translate-x-full');
             el.classList.replace('opacity-100', 'opacity-0');
+            el.classList.replace('pointer-events-auto', 'pointer-events-none');
         }
 
         window.resetarApp = async () => {
             if(confirm("Voltar para o Dia 1 e reiniciar progresso na nuvem?")) {
-                appState.diaAtual = 1; appState.tarefasFeitasHoje = { ex1: false, ex2: false };
-                await salvarProgressoNuvem(); location.reload();
+                appState.diaAtual = 1; 
+                appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+                await salvarProgressoNuvem(); 
+                location.reload();
             }
         };
 
