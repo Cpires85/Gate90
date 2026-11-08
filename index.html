@@ -121,24 +121,15 @@
         <button class="text-gray-500"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></button>
     </nav>
 
-    <!-- CONEXÃO FIREBASE & LÓGICA -->
+    <!-- MOTOR JAVASCRIPT & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // COLOQUE A SUA API KEY REAL AQUI ABAIXO:
-        const firebaseConfig = {
-            apiKey: "AIzaSyDMR6Aq9KoDGPkZLZueBgIo7AhNx5Gj08Q",
-  authDomain: "nosso-bolso-c8d29.firebaseapp.com",
-  projectId: "nosso-bolso-c8d29",
-  storageBucket: "nosso-bolso-c8d29.firebasestorage.app",
-  messagingSenderId: "812166717623",
-  appId: "1:812166717623:web:ba3a4c0db18484be47ad32"
-};
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const userRef = doc(db, 'users', 'admin');
+        // ESTADO INICIAL DA INTERFACE
+        let appState = { diaAtual: 1, tarefasFeitasHoje: { ex1: false, ex2: false }, last_study_date: null };
+        let dbRef = null;
+        let userRef = null;
 
         const vocabularioMaster = [
             { en: "A table for three, please.", pt: "Uma mesa para três, por favor.", pronuncia: "A tei-bôu fór tri, plíz.", wrong: ["Gostaria de pagar a conta.", "Onde fica o banheiro?"] },
@@ -153,44 +144,7 @@
             { en: "My daughter wants to see Cinderella.", pt: "Minha filha quer ver a Cinderela.", pronuncia: "Mái dór-târ uónts tú sí Sin-dê-ré-la.", wrong: ["Onde compramos os ingressos?", "Nós já tiramos foto ali."] }
         ];
 
-        let appState = { diaAtual: 1, tarefasFeitasHoje: { ex1: false, ex2: false }, last_study_date: null };
-
-        async function carregarProgressoNuvem() {
-            try {
-                const snap = await getDoc(userRef);
-                if (snap.exists()) {
-                    appState = snap.data();
-                    if (appState.last_study_date) {
-                        const hoje = new Date();
-                        const ultimoAcesso = new Date(appState.last_study_date);
-                        hoje.setHours(0,0,0,0); ultimoAcesso.setHours(0,0,0,0);
-                        const diffDias = Math.ceil(Math.abs(hoje - ultimoAcesso) / (1000 * 60 * 60 * 24));
-                        
-                        if (diffDias > 1 && (!appState.tarefasFeitasHoje.ex1 || !appState.tarefasFeitasHoje.ex2)) {
-                            alert("Ofensiva perdida! Mais de 24h sem completar as tarefas. Voltando ao Dia 1.");
-                            appState.diaAtual = 1;
-                            appState.tarefasFeitasHoje = { ex1: false, ex2: false };
-                            await salvarProgressoNuvem();
-                        }
-                    }
-                } else {
-                    appState.last_study_date = new Date().toISOString();
-                    await setDoc(userRef, appState);
-                }
-                renderizarTrilha();
-            } catch(e) {
-                console.error(e);
-                renderizarTrilha(); // Carrega visual mesmo se falhar
-            }
-        }
-
-        async function salvarProgressoNuvem() {
-            try {
-                appState.last_study_date = new Date().toISOString();
-                await setDoc(userRef, appState, { merge: true });
-            } catch(e) { console.error(e); }
-        }
-
+        // 1. DESENHA A INTERFACE IMEDIATAMENTE
         const trailContainer = document.getElementById('trail-container');
         function renderizarTrilha() {
             trailContainer.innerHTML = ''; 
@@ -220,6 +174,68 @@
             setTimeout(() => { const el = document.getElementById('dia-ativo'); if(el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
         }
 
+        renderizarTrilha();
+
+        // 2. CONFIGURA O FIREBASE
+        try {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCoPDNQzzka-c65080QzZCarpK7__kFZwQ",
+                authDomain: "gate90-f3bbd.firebaseapp.com",
+                projectId: "gate90-f3bbd",
+                storageBucket: "gate90-f3bbd.firebasestorage.app",
+                messagingSenderId: "91212411474",
+                appId: "1:91212411474:web:7a7a1a41eb2c09f522658b"
+            };
+            
+            const app = initializeApp(firebaseConfig);
+            dbRef = getFirestore(app);
+            userRef = doc(dbRef, 'users', 'admin');
+            
+            carregarProgressoNuvem();
+
+        } catch (error) {
+            console.error("Erro ao configurar Firebase:", error);
+            alert("Atenção: Houve um erro de ligação ao Firebase. A aplicação funcionará em modo offline.");
+        }
+
+        async function carregarProgressoNuvem() {
+            if(!userRef) return;
+            try {
+                const snap = await getDoc(userRef);
+                if (snap.exists()) {
+                    appState = snap.data();
+                    if (appState.last_study_date) {
+                        const hoje = new Date();
+                        const ultimoAcesso = new Date(appState.last_study_date);
+                        hoje.setHours(0,0,0,0); ultimoAcesso.setHours(0,0,0,0);
+                        const diffDias = Math.ceil(Math.abs(hoje - ultimoAcesso) / (1000 * 60 * 60 * 24));
+                        
+                        if (diffDias > 1 && (!appState.tarefasFeitasHoje.ex1 || !appState.tarefasFeitasHoje.ex2)) {
+                            alert("Ofensiva perdida! Mais de 24h sem completar as tarefas. Voltando ao Dia 1.");
+                            appState.diaAtual = 1;
+                            appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+                            await salvarProgressoNuvem();
+                        }
+                    }
+                } else {
+                    appState.last_study_date = new Date().toISOString();
+                    await setDoc(userRef, appState);
+                }
+                renderizarTrilha();
+            } catch(e) {
+                console.error("Erro ao ler da nuvem:", e);
+            }
+        }
+
+        async function salvarProgressoNuvem() {
+            if(!userRef) return;
+            try {
+                appState.last_study_date = new Date().toISOString();
+                await setDoc(userRef, appState, { merge: true });
+            } catch(e) { console.error(e); }
+        }
+
+        // LÓGICA DE EXERCÍCIOS E CLIQUES
         window.abrirMenuDoDia = () => {
             document.getElementById('menu-title').innerText = `Tarefas: Dia ${appState.diaAtual}`;
             atualizarBotoesMenu();
@@ -375,7 +391,6 @@
             }
         };
 
-        carregarProgressoNuvem();
     </script>
 </body>
 </html>
