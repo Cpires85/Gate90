@@ -13,23 +13,19 @@
             --gray-locked: #37464F; --gray-locked-shadow: #202F36;
         }
         body { background-color: var(--bg-dark); color: white; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        /* Oculta a barra de rolagem mas permite rolar */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
-        
         .perspective-1000 { perspective: 1000px; }
-        #flashcard { touch-action: none; /* Evita que a tela role enquanto arrasta o card */ }
+        #flashcard { touch-action: none; } /* Evita rolar a tela ao arrastar o card */
     </style>
 </head>
 <body class="flex flex-col h-screen relative overflow-hidden">
 
-    <!-- CABEÇALHO (Toque e segure a foto para Resetar) -->
+    <!-- CABEÇALHO -->
     <header class="flex justify-between items-center p-4 sticky top-0 z-10 bg-[#131F24] border-b border-gray-800 shrink-0">
-        <div id="btn-reset" class="w-10 h-10 rounded-full border-2 border-gray-700 overflow-hidden bg-white active:scale-95 transition-transform">
+        <div id="btn-reset" class="w-10 h-10 rounded-full border-2 border-gray-700 overflow-hidden bg-white active:scale-95 transition-transform" onclick="resetarApp()">
             <img src="151623.png" alt="Mascote" class="w-full h-full object-cover">
         </div>
         <div class="flex items-center space-x-6 text-sm font-extrabold">
-            <div class="flex items-center space-x-2 text-white"><span class="text-xl">🇺🇸</span><span>1</span></div>
             <div class="flex items-center space-x-1 text-[var(--red-streak)]">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
                 <span id="streak-counter">1</span>
@@ -37,309 +33,417 @@
         </div>
     </header>
 
-    <!-- TRILHA DE APRENDIZADO (Gerada dinamicamente pelo JS) -->
+    <!-- TRILHA PRINCIPAL -->
     <main class="flex-1 overflow-y-auto pb-24 relative flex flex-col items-center w-full" id="scroll-area">
-        
-        <!-- Banner Inicial -->
         <div class="w-11/12 max-w-md mt-6 p-4 rounded-2xl bg-[var(--green-main)] flex justify-between items-center shadow-lg">
             <div>
-                <p class="text-white/80 text-xs font-bold tracking-widest uppercase mb-1">Bloco 1</p>
-                <h2 class="text-white text-xl font-bold leading-tight">Imigração e Aeroporto</h2>
+                <p class="text-white/80 text-xs font-bold tracking-widest uppercase mb-1" id="bloco-titulo">Bloco 1</p>
+                <h2 class="text-white text-xl font-bold leading-tight">Desafio 90 Dias</h2>
             </div>
         </div>
-
-        <!-- CONTAINER DA TRILHA DE 90 DIAS -->
-        <div id="trail-container" class="mt-10 flex flex-col items-center gap-6 w-full pb-20">
-            <!-- O JavaScript vai injetar os 90 dias aqui dentro -->
-        </div>
-
+        <div id="trail-container" class="mt-10 flex flex-col items-center gap-6 w-full pb-20"></div>
     </main>
 
-    <!-- TELA DO MENU DO DIA -->
+    <!-- MENU DO DIA -->
     <div id="daily-menu" class="fixed inset-0 bg-[#131F24] z-30 flex flex-col transition-transform duration-300 translate-y-full opacity-0">
         <div class="p-6 flex justify-between items-center border-b border-gray-800">
-            <h2 id="menu-title" class="text-2xl font-bold text-white">Tarefas do Dia</h2>
+            <h2 id="menu-title" class="text-2xl font-bold text-white">Tarefas: Dia X</h2>
             <button onclick="fecharTela('daily-menu')" class="text-gray-400 p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         
         <div class="flex-1 p-6 space-y-4 overflow-y-auto">
-            <button onclick="abrirFlashcards()" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between active:translate-y-1 active:border-b-0 transition-all">
+            <!-- Exercício 1: Flashcards -->
+            <button id="btn-ex1" onclick="iniciarExercicio('flashcards')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
                 <div class="flex items-center space-x-4">
                     <div class="bg-[var(--blue-main)] p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></div>
-                    <div class="text-left">
-                        <h3 class="font-bold text-white">Cards Interativos</h3>
-                        <p class="text-xs text-gray-400">Treine a leitura e fala</p>
-                    </div>
+                    <div class="text-left"><h3 class="font-bold text-white">1. Cards com Áudio (10)</h3><p class="text-xs text-gray-400">Treine a leitura e fala</p></div>
                 </div>
-                <div class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+                <div id="status-ex1" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
             </button>
-            <!-- Mais tarefas podem ser adicionadas aqui -->
+
+            <!-- Exercício 2: Quiz -->
+            <button id="btn-ex2" onclick="iniciarExercicio('quiz')" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 active:border-b-0">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-purple-500 p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+                    <div class="text-left"><h3 class="font-bold text-white">2. Múltipla Escolha (10)</h3><p class="text-xs text-gray-400">Qual o significado correto?</p></div>
+                </div>
+                <div id="status-ex2" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+            </button>
+        </div>
+
+        <div class="p-6 border-t border-gray-800">
+            <button id="btn-concluir-dia" onclick="concluirDia()" class="w-full bg-[var(--gray-locked)] text-gray-500 border-b-[6px] border-[var(--gray-locked-shadow)] rounded-2xl py-4 font-extrabold text-lg uppercase tracking-wider transition-all pointer-events-none active:translate-y-1 active:border-b-0">
+                Terminar Exercícios
+            </button>
         </div>
     </div>
 
-    <!-- TELA DOS FLASHCARDS (Arrastar para os lados) -->
+    <!-- TELA: FLASHCARDS (Com Física de Arrastar) -->
     <div id="flashcard-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0">
         <div class="p-4 flex justify-between items-center border-b border-gray-800">
             <button onclick="fecharTela('flashcard-screen')" class="text-gray-400 p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-            <div class="w-full mx-4 h-3 bg-gray-800 rounded-full overflow-hidden">
-                <div class="h-full bg-[var(--green-main)] w-1/5 rounded-full transition-all"></div>
-            </div>
+            <div class="text-gray-400 font-bold" id="fc-counter">1/10</div>
         </div>
-        
         <div class="flex-1 flex items-center justify-center p-6 w-full relative perspective-1000 overflow-hidden">
-            
-            <!-- O CARD EM SI -->
+            <!-- O CARD -->
             <div id="flashcard" class="w-full max-w-sm h-[400px] bg-[var(--gray-locked)] rounded-3xl shadow-2xl border border-gray-700 p-6 flex flex-col items-center justify-center text-center transition-transform duration-200 cursor-grab relative">
                 
-                <!-- Frente (Pergunta) -->
+                <!-- Frente -->
                 <div id="card-front" class="w-full h-full flex flex-col items-center justify-center">
                     <p class="text-gray-400 text-sm mb-4 uppercase tracking-widest font-bold">Como você diria?</p>
-                    <h2 class="text-2xl font-bold text-white leading-tight">Pedir uma mesa para você, sua esposa e sua filha.</h2>
+                    <h2 id="fc-frente" class="text-2xl font-bold text-white leading-tight">...</h2>
                     <button class="mt-8 bg-[var(--blue-main)] text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest shadow-lg animate-pulse" onclick="virarCard()">Revelar Resposta</button>
                 </div>
 
-                <!-- Verso (Resposta Oculta inicialmente) -->
+                <!-- Verso -->
                 <div id="card-back" class="w-full h-full flex flex-col items-center justify-center hidden">
-                    <h2 class="text-3xl font-black text-[var(--green-main)] mb-4">"A table for three, please."</h2>
-                    <p class="text-gray-400 text-sm italic bg-[#131F24] px-4 py-3 rounded-xl border border-gray-800 mb-8">A tei-bôu fór tri, plíz.</p>
-                    
+                    <h2 id="fc-verso" class="text-3xl font-black text-[var(--green-main)] mb-4">...</h2>
+                    <p id="fc-pronuncia" class="text-gray-400 text-sm italic bg-[#131F24] px-4 py-3 rounded-xl border border-gray-800 mb-8">...</p>
                     <p class="text-xs text-gray-500 mb-4 font-bold uppercase tracking-widest">Deslize o card ou use os botões</p>
-                    
-                    <!-- Botões clicáveis (Caso o usuário prefira clicar em vez de arrastar) -->
                     <div class="flex justify-between w-full mt-auto gap-4">
-                        <button onclick="processarResposta('errei')" class="flex-1 bg-[#131F24] border-2 border-red-500/50 text-red-400 font-bold py-4 rounded-2xl active:bg-red-500 active:text-white transition-colors">
-                            &larr; ERREI
-                        </button>
-                        <button onclick="processarResposta('facil')" class="flex-1 bg-[#131F24] border-2 border-green-500/50 text-green-400 font-bold py-4 rounded-2xl active:bg-green-500 active:text-white transition-colors">
-                            FÁCIL &rarr;
-                        </button>
+                        <button onclick="processarCard('errei')" class="flex-1 bg-[#131F24] border-2 border-red-500/50 text-red-400 font-bold py-4 rounded-2xl active:bg-red-500 active:text-white transition-colors">&larr; ERREI</button>
+                        <button onclick="processarCard('facil')" class="flex-1 bg-[#131F24] border-2 border-green-500/50 text-green-400 font-bold py-4 rounded-2xl active:bg-green-500 active:text-white transition-colors">FÁCIL &rarr;</button>
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 
-    <!-- Navegação Inferior -->
+    <!-- TELA: QUIZ (Múltipla Escolha) -->
+    <div id="quiz-screen" class="fixed inset-0 bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0">
+        <div class="p-4 flex justify-between items-center border-b border-gray-800">
+            <button onclick="fecharTela('quiz-screen')" class="text-gray-400 p-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+            <div class="text-gray-400 font-bold" id="quiz-counter">1/10</div>
+        </div>
+        <div class="flex-1 p-6 flex flex-col overflow-y-auto">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest text-center mt-2">Qual a tradução de:</h2>
+            <h1 id="quiz-pergunta" class="text-2xl font-black text-[var(--green-main)] text-center mt-4 mb-8 leading-tight">"..."</h1>
+            <div id="quiz-opcoes" class="flex flex-col gap-4 pb-8">
+                <!-- Opções injetadas via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGAÇÃO INFERIOR -->
     <nav class="fixed bottom-0 w-full bg-[#131F24] border-t-2 border-gray-800 flex justify-around items-center p-3 z-0 shrink-0">
         <button class="text-[var(--green-main)] p-2 bg-[var(--green-main)]/10 rounded-xl"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-        <button class="text-gray-500 hover:text-white transition"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></button>
+        <button class="text-gray-500"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></button>
     </nav>
 
-    <script>
-        // CONFIGURAÇÃO INICIAL (Dia 1 de 90)
-        let diaAtual = 1; 
-        const totalDias = 90;
-        
-        // 1. GERAÇÃO DINÂMICA DA TRILHA
+    <!-- MOTOR JAVASCRIPT & FIREBASE -->
+    <script type="module">
+        import { db, doc, getDoc, setDoc, updateDoc } from './firebase-config.js';
+
+        // SEMENTES DE VOCABULÁRIO (Incluindo perfil familiar)
+        const vocabularioMaster = [
+            { en: "A table for three, please.", pt: "Uma mesa para três, por favor.", pronuncia: "A tei-bôu fór tri, plíz.", wrong: ["Gostaria de pagar a conta.", "Onde fica o banheiro?"] },
+            { en: "Here are our passports.", pt: "Aqui estão nossos passaportes.", pronuncia: "Hír ár aour pás-pórts.", wrong: ["Nós perdemos o voo.", "Aqui está minha bagagem."] },
+            { en: "How long is the wait?", pt: "Qual é o tempo de espera?", pronuncia: "Ráu lóng is dâ uêit?", wrong: ["A que horas fecha?", "Onde fica a saída?"] },
+            { en: "Could we get the check, please?", pt: "Pode trazer a conta?", pronuncia: "Cúd uí guét dâ tchék, plíz?", wrong: ["Podemos pedir água?", "Onde é a mesa?"] },
+            { en: "Where is the nearest restroom?", pt: "Onde fica o banheiro mais próximo?", pronuncia: "Uér is dâ ní-rest rés-trum?", wrong: ["Onde fica a praça de alimentação?", "A que horas abre o parque?"] },
+            { en: "We are traveling as a family.", pt: "Estamos viajando em família.", pronuncia: "Uí ár tré-vã-lin és a fê-mili.", wrong: ["Estamos viajando a negócios.", "Eu viajo sozinho."] },
+            { en: "The air conditioning isn't working.", pt: "O ar-condicionado não está funcionando.", pronuncia: "Dâ ér con-dí-xio-nin í-zãnt uôr-kin.", wrong: ["A televisão quebrou.", "A porta não abre."] },
+            { en: "Could you take a picture of us?", pt: "Você poderia tirar uma foto nossa?", pronuncia: "Cúd iú têik a pík-tshur óv âs?", wrong: ["Posso tirar uma foto do castelo?", "Quanto custa essa foto?"] },
+            { en: "I have a reservation under Pires.", pt: "Eu tenho uma reserva no nome de Pires.", pronuncia: "Ái hév a re-zâr-vei-xâ-n ân-dâr Pí-ris.", wrong: ["Preciso de um quarto duplo.", "Quero cancelar minha viagem."] },
+            { en: "My daughter wants to see Cinderella.", pt: "Minha filha quer ver a Cinderela.", pronuncia: "Mái dór-târ uónts tú sí Sin-dê-ré-la.", wrong: ["Onde compramos os ingressos?", "Nós já tiramos foto ali."] }
+        ];
+
+        let appState = { diaAtual: 1, tarefasFeitasHoje: { ex1: false, ex2: false }, last_study_date: null };
+        const userRef = doc(db, 'users', 'admin');
+
+        // 1. SINCRONIZAÇÃO COM FIREBASE
+        async function carregarProgressoNuvem() {
+            try {
+                const snap = await getDoc(userRef);
+                if (snap.exists()) {
+                    appState = snap.data();
+                    
+                    // Verificação rigorosa de 24h
+                    if (appState.last_study_date) {
+                        const hoje = new Date();
+                        const ultimoAcesso = new Date(appState.last_study_date);
+                        hoje.setHours(0,0,0,0);
+                        ultimoAcesso.setHours(0,0,0,0);
+                        
+                        const diffDias = Math.ceil(Math.abs(hoje - ultimoAcesso) / (1000 * 60 * 60 * 24));
+                        
+                        // Passou mais de 1 dia e não terminou as tarefas = Punição
+                        if (diffDias > 1 && (!appState.tarefasFeitasHoje.ex1 || !appState.tarefasFeitasHoje.ex2)) {
+                            alert("Você perdeu sua ofensiva! Ficou mais de 24h sem completar o desafio. Voltando ao Dia 1.");
+                            appState.diaAtual = 1;
+                            appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+                            await salvarProgressoNuvem();
+                        }
+                    }
+                } else {
+                    appState.last_study_date = new Date().toISOString();
+                    await setDoc(userRef, appState);
+                }
+                renderizarTrilha();
+            } catch(e) {
+                console.error("Erro ao ler Firebase. Usando padrão.", e);
+                renderizarTrilha();
+            }
+        }
+
+        async function salvarProgressoNuvem() {
+            try {
+                appState.last_study_date = new Date().toISOString();
+                await updateDoc(userRef, appState);
+            } catch(e) {
+                console.error("Erro ao salvar no Firebase.", e);
+            }
+        }
+
+        // 2. RENDERIZAÇÃO DA TRILHA
         const trailContainer = document.getElementById('trail-container');
-        const posicoesX = [-30, 20, -15, 35]; // Padrão de zigue-zague
-
         function renderizarTrilha() {
-            trailContainer.innerHTML = ''; // Limpa a trilha
+            trailContainer.innerHTML = ''; 
+            document.getElementById('streak-counter').textContent = appState.diaAtual;
             
-            // Calcula qual é o próximo mascote (20, 40, 60, 80)
-            let proximoMascote = Math.ceil(diaAtual / 20) * 20;
-            if (proximoMascote === 0) proximoMascote = 20;
-            if (proximoMascote > 80) proximoMascote = 90;
-
-            for (let i = 1; i <= totalDias; i++) {
+            const posicoesX = [-30, 20, -15, 35];
+            for (let i = 1; i <= 90; i++) {
                 const offsetX = posicoesX[(i - 1) % posicoesX.length];
-                const isRevisao = (i % 4 === 0); // Dia de revisão a cada 4 dias
-                let estado = '';
-                
-                if (i < diaAtual) estado = 'concluido';
-                else if (i === diaAtual) estado = 'ativo';
-                else estado = 'bloqueado';
+                let btnHtml = '';
+                let extra = '';
 
-                let nodeHTML = '';
-                
-                if (estado === 'concluido') {
-                    nodeHTML = `
-                        <div class="translate-x-[${offsetX}px] w-full flex justify-center">
-                            <button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-                            </button>
-                        </div>`;
-                } 
-                else if (estado === 'ativo') {
-                    nodeHTML = `
-                        <div class="translate-x-[${offsetX}px] w-full flex justify-center mt-2 mb-2 relative z-10" id="dia-ativo">
-                            <!-- Balão do Dia Ativo -->
-                            <div class="absolute -top-12 bg-[#37464F] border border-gray-600 text-[var(--green-main)] text-sm font-extrabold uppercase tracking-widest px-4 py-2 rounded-xl animate-bounce shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent after:border-t-[#37464F]">
-                                Dia ${i}
-                            </div>
-                            <!-- Botão Pulsante -->
-                            <button onclick="abrirMenuDoDia(${i})" class="w-[85px] h-[85px] rounded-full bg-[var(--green-main)] border-b-[8px] border-[var(--green-shadow)] flex items-center justify-center text-white text-3xl font-black relative ring-4 ring-white/10 shadow-2xl active:translate-y-1 active:border-b-0">
-                                ${i}
-                            </button>
+                if (i < appState.diaAtual) {
+                    btnHtml = `<button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></button>`;
+                } else if (i === appState.diaAtual) {
+                    btnHtml = `
+                        <div class="relative z-10" id="dia-ativo">
+                            <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#37464F] text-[var(--green-main)] text-sm font-extrabold px-4 py-2 rounded-xl animate-bounce shadow-lg">Dia ${i}</div>
+                            <button onclick="abrirMenuDoDia()" class="w-[85px] h-[85px] rounded-full bg-[var(--green-main)] border-b-[8px] border-[var(--green-shadow)] text-white text-3xl font-black shadow-2xl active:translate-y-1 active:border-b-0">${i}</button>
                             <div class="absolute top-0 w-[85px] h-[85px] rounded-full bg-[var(--green-main)] opacity-30 animate-ping -z-10"></div>
                         </div>`;
-                } 
-                else {
-                    // Bloqueado
-                    let iconeBloqueado = `<span class="text-2xl font-black">${i}</span>`;
-                    if (isRevisao) {
-                        iconeBloqueado = `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z"/></svg>`;
+                } else {
+                    btnHtml = `<button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] text-gray-500 font-black text-2xl">${i}</button>`;
+                    if (i % 20 === 0 && i >= appState.diaAtual) {
+                        extra = `<div class="absolute left-[60%] top-[-30px] flex items-end drop-shadow-xl z-10 w-48"><img src="151623.png" class="w-16 h-16 rounded-full border-2 border-gray-600 bg-white" alt="Mascote"><div class="bg-white text-gray-800 text-xs font-bold py-2 px-3 rounded-2xl rounded-bl-none ml-1 mb-6">Estou te esperando!</div></div>`;
                     }
-                    nodeHTML = `
-                        <div class="translate-x-[${offsetX}px] w-full flex justify-center relative">
-                            <button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] flex items-center justify-center text-gray-500 cursor-not-allowed">
-                                ${iconeBloqueado}
-                            </button>
-                            
-                            ${i === proximoMascote ? `
-                            <!-- MASCOTE ESPERANDO NA META (20, 40, etc) -->
-                            <div class="absolute left-[60%] top-[-30px] flex items-end drop-shadow-xl z-10 w-48">
-                                <img src="151623.png" class="w-16 h-16 rounded-full border-2 border-gray-600 bg-white" alt="Mascote">
-                                <div class="bg-white text-gray-800 text-xs font-bold py-2 px-3 rounded-2xl rounded-bl-none ml-1 mb-6 shadow-lg whitespace-nowrap">
-                                    Estou te esperando!
-                                </div>
-                            </div>
-                            ` : ''}
-                        </div>`;
                 }
-                
-                trailContainer.insertAdjacentHTML('beforeend', nodeHTML);
+                trailContainer.insertAdjacentHTML('beforeend', `<div class="translate-x-[${offsetX}px] w-full flex justify-center relative my-2">${btnHtml}${extra}</div>`);
             }
-            
-            // Centraliza a tela no dia ativo automaticamente ao carregar
-            setTimeout(() => {
-                const elementoAtivo = document.getElementById('dia-ativo');
-                if(elementoAtivo) elementoAtivo.scrollIntoView({ behavior: "smooth", block: "center" });
-            }, 500);
+            setTimeout(() => { const el = document.getElementById('dia-ativo'); if(el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
         }
 
-        renderizarTrilha();
-
-        // 2. FUNÇÃO DE RESET (Pressionar a foto do perfil por 2 segundos)
-        let resetTimer;
-        const btnReset = document.getElementById('btn-reset');
-        
-        btnReset.addEventListener('touchstart', () => {
-            resetTimer = setTimeout(() => {
-                diaAtual = 1;
-                document.getElementById('streak-counter').textContent = '1';
-                renderizarTrilha();
-                alert("App reiniciado! Você voltou para o Dia 1.");
-            }, 2000); // 2 segundos segurando
-        });
-        btnReset.addEventListener('touchend', () => clearTimeout(resetTimer));
-
-
-        // 3. NAVEGAÇÃO ENTRE TELAS
-        function abrirMenuDoDia(dia) {
-            document.getElementById('menu-title').innerText = `Tarefas: Dia ${dia}`;
+        // 3. MENU DO DIA
+        window.abrirMenuDoDia = () => {
+            document.getElementById('menu-title').innerText = `Tarefas: Dia ${appState.diaAtual}`;
+            atualizarBotoesMenu();
             document.getElementById('daily-menu').classList.replace('translate-y-full', 'translate-y-0');
             document.getElementById('daily-menu').classList.replace('opacity-0', 'opacity-100');
-        }
-        function fecharTela(id) {
-            const el = document.getElementById(id);
-            if(el.classList.contains('translate-y-0')) {
-                el.classList.replace('translate-y-0', 'translate-y-full');
-            } else {
-                el.classList.replace('translate-x-0', 'translate-x-full');
+        };
+
+        function atualizarBotoesMenu() {
+            const btnEx1 = document.getElementById('btn-ex1');
+            const statusEx1 = document.getElementById('status-ex1');
+            if (appState.tarefasFeitasHoje.ex1) {
+                btnEx1.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--bg-dark)]');
+                btnEx1.style.opacity = '0.5';
+                statusEx1.innerHTML = `<svg class="w-8 h-8 text-[var(--green-main)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>`;
             }
-            el.classList.replace('opacity-100', 'opacity-0');
+
+            const btnEx2 = document.getElementById('btn-ex2');
+            const statusEx2 = document.getElementById('status-ex2');
+            if (appState.tarefasFeitasHoje.ex2) {
+                btnEx2.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--bg-dark)]');
+                btnEx2.style.opacity = '0.5';
+                statusEx2.innerHTML = `<svg class="w-8 h-8 text-[var(--green-main)]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>`;
+            }
+
+            const btnConcluir = document.getElementById('btn-concluir-dia');
+            if (appState.tarefasFeitasHoje.ex1 && appState.tarefasFeitasHoje.ex2) {
+                btnConcluir.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--green-main)]');
+                btnConcluir.classList.replace('border-[var(--gray-locked-shadow)]', 'border-[var(--green-shadow)]');
+                btnConcluir.classList.replace('text-gray-500', 'text-white');
+                btnConcluir.classList.remove('pointer-events-none');
+            }
         }
-        function abrirFlashcards() {
-            fecharTela('daily-menu');
-            document.getElementById('flashcard-screen').classList.replace('translate-x-full', 'translate-x-0');
-            document.getElementById('flashcard-screen').classList.replace('opacity-0', 'opacity-100');
+
+        window.concluirDia = async () => {
+            appState.diaAtual++;
+            appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+            await salvarProgressoNuvem();
+            fecharTelaBase('daily-menu');
+            renderizarTrilha();
+        };
+
+        // 4. LÓGICA DE EXERCÍCIOS
+        let licaoAtual = [];
+        let indexAtual = 0;
+        const totalItems = 10;
+
+        window.iniciarExercicio = (tipo) => {
+            if (tipo === 'flashcards' && appState.tarefasFeitasHoje.ex1) return;
+            if (tipo === 'quiz' && appState.tarefasFeitasHoje.ex2) return;
+
+            // Gera lote de 10 frases misturadas
+            licaoAtual = [...vocabularioMaster].sort(() => Math.random() - 0.5).slice(0, totalItems);
+            while(licaoAtual.length < totalItems) {
+                licaoAtual.push(vocabularioMaster[Math.floor(Math.random() * vocabularioMaster.length)]);
+            }
+            indexAtual = 0;
+
+            if (tipo === 'flashcards') {
+                fecharTelaBase('daily-menu');
+                document.getElementById('flashcard-screen').classList.replace('translate-x-full', 'translate-x-0');
+                document.getElementById('flashcard-screen').classList.replace('opacity-0', 'opacity-100');
+                renderizarFlashcard();
+            } else if (tipo === 'quiz') {
+                fecharTelaBase('daily-menu');
+                document.getElementById('quiz-screen').classList.replace('translate-x-full', 'translate-x-0');
+                document.getElementById('quiz-screen').classList.replace('opacity-0', 'opacity-100');
+                renderizarQuiz();
+            }
+        };
+
+        // --- FLASHCARD (COM SWIPE ESTILO TINDER) ---
+        let cardVirado = false;
+        const flashcard = document.getElementById('flashcard');
+        let startX = 0, currentTranslate = 0, isDragging = false;
+
+        function renderizarFlashcard() {
+            document.getElementById('fc-counter').innerText = `${indexAtual + 1}/${totalItems}`;
+            document.getElementById('fc-frente').innerText = licaoAtual[indexAtual].pt;
+            document.getElementById('fc-verso').innerText = `"${licaoAtual[indexAtual].en}"`;
+            document.getElementById('fc-pronuncia').innerText = licaoAtual[indexAtual].pronuncia;
             
-            // Reseta o card para a posição inicial (frente)
             document.getElementById('card-front').classList.remove('hidden');
             document.getElementById('card-back').classList.add('hidden');
-            flashcard.style.transform = `translateX(0px) rotate(0deg)`;
+            cardVirado = false;
         }
 
-        // 4. FÍSICA E LÓGICA DOS FLASHCARDS (Arrastar estilo Tinder)
-        const flashcard = document.getElementById('flashcard');
-        const cardFront = document.getElementById('card-front');
-        const cardBack = document.getElementById('card-back');
-        let cardVirado = false;
-        
-        let startX = 0;
-        let currentTranslate = 0;
-        let isDragging = false;
-
-        function virarCard() {
-            cardFront.classList.add('hidden');
-            cardBack.classList.remove('hidden');
+        window.virarCard = () => {
+            document.getElementById('card-front').classList.add('hidden');
+            document.getElementById('card-back').classList.remove('hidden');
             cardVirado = true;
-            tocarPronuncia();
-        }
-
-        function tocarPronuncia() {
             if ('speechSynthesis' in window) {
-                const fala = new SpeechSynthesisUtterance("A table for three, please.");
-                fala.lang = 'en-US';
-                fala.rate = 0.85;
-                window.speechSynthesis.speak(fala);
+                const fala = new SpeechSynthesisUtterance(licaoAtual[indexAtual].en);
+                fala.lang = 'en-US'; window.speechSynthesis.speak(fala);
             }
-        }
+        };
 
-        // Detecta o toque e inicio do arraste
+        // Física do toque na tela
         flashcard.addEventListener('touchstart', (e) => {
-            if (!cardVirado) return; // Só permite arrastar se a resposta estiver visível
+            if (!cardVirado) return;
             startX = e.touches[0].clientX;
             isDragging = true;
-            flashcard.style.transition = 'none'; // Remove a transição suave para grudar no dedo
+            flashcard.style.transition = 'none';
         });
 
-        // Move o card acompanhando o dedo
         flashcard.addEventListener('touchmove', (e) => {
             if (!isDragging || !cardVirado) return;
-            const currentX = e.touches[0].clientX;
-            currentTranslate = currentX - startX;
-            // Inclina levemente o card enquanto puxa para o lado
+            currentTranslate = e.touches[0].clientX - startX;
             flashcard.style.transform = `translateX(${currentTranslate}px) rotate(${currentTranslate * 0.05}deg)`;
         });
 
-        // Quando o usuário solta o dedo da tela
         flashcard.addEventListener('touchend', () => {
             if (!isDragging || !cardVirado) return;
             isDragging = false;
-            flashcard.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out'; // Volta a transição
-            
-            // Se puxou mais que 100px para a direita (FÁCIL)
-            if (currentTranslate > 100) {
-                processarResposta('facil');
-            } 
-            // Se puxou mais que 100px para a esquerda (ERREI)
-            else if (currentTranslate < -100) {
-                processarResposta('errei');
-            } 
-            // Se soltou antes da margem, o card volta pro meio como um elástico
-            else {
-                flashcard.style.transform = `translateX(0px) rotate(0deg)`;
-            }
+            flashcard.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            if (currentTranslate > 100) window.processarCard('facil');
+            else if (currentTranslate < -100) window.processarCard('errei');
+            else flashcard.style.transform = `translateX(0px) rotate(0deg)`; // Volta pro meio
         });
 
-        // Ação executada ao puxar até o final ou ao clicar nos botões diretamente
-        function processarResposta(resultado) {
-            if(resultado === 'facil') {
-                flashcard.style.transform = `translateX(500px) rotate(30deg)`; // Joga pra direita
-            } else {
-                flashcard.style.transform = `translateX(-500px) rotate(-30deg)`; // Joga pra esquerda
-            }
+        window.processarCard = async (acao) => {
+            // Animação de saída baseada na ação (Botão ou Dedo)
+            if(acao === 'facil') flashcard.style.transform = `translateX(500px) rotate(30deg)`;
+            else flashcard.style.transform = `translateX(-500px) rotate(-30deg)`;
             flashcard.style.opacity = '0';
             
-            setTimeout(() => {
-                // Aqui no futuro puxaríamos a próxima palavra. 
-                // Por enquanto vamos apenas fechar a tela para simular a conclusão.
-                fecharTela('flashcard-screen');
+            setTimeout(async () => {
+                indexAtual++;
+                if (indexAtual >= totalItems) {
+                    appState.tarefasFeitasHoje.ex1 = true;
+                    await salvarProgressoNuvem();
+                    fecharTelaBase('flashcard-screen');
+                    window.abrirMenuDoDia();
+                } else {
+                    renderizarFlashcard();
+                }
+                // Reseta a posição pro próximo card
                 flashcard.style.transform = `translateX(0px) rotate(0deg)`;
                 flashcard.style.opacity = '1';
-                cardVirado = false;
-                
-                // Simula avançar 1 dia no progresso
-                diaAtual++;
-                document.getElementById('streak-counter').textContent = diaAtual;
-                renderizarTrilha();
             }, 300);
+        };
+
+        // --- QUIZ (MÚLTIPLA ESCOLHA) ---
+        function renderizarQuiz() {
+            document.getElementById('quiz-counter').innerText = `${indexAtual + 1}/${totalItems}`;
+            const item = licaoAtual[indexAtual];
+            document.getElementById('quiz-pergunta').innerText = `"${item.en}"`;
+
+            let opcoes = [item.pt, item.wrong[0], item.wrong[1]].sort(() => Math.random() - 0.5);
+            const container = document.getElementById('quiz-opcoes');
+            container.innerHTML = '';
+
+            opcoes.forEach(opcao => {
+                const isCorreta = opcao === item.pt;
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-5 rounded-2xl text-white font-bold text-lg active:translate-y-1 active:border-b-0 transition-all text-left shadow-md";
+                btn.innerText = opcao;
+                btn.onclick = () => processarRespostaQuiz(btn, isCorreta);
+                container.appendChild(btn);
+            });
         }
 
+        async function processarRespostaQuiz(botao, isCorreta) {
+            const todosBotoes = document.getElementById('quiz-opcoes').querySelectorAll('button');
+            todosBotoes.forEach(b => b.style.pointerEvents = 'none');
+
+            if (isCorreta) {
+                botao.classList.replace('bg-[var(--gray-locked)]', 'bg-[var(--green-main)]');
+                botao.classList.replace('border-[var(--gray-locked-shadow)]', 'border-[var(--green-shadow)]');
+                setTimeout(async () => {
+                    indexAtual++;
+                    if (indexAtual >= totalItems) {
+                        appState.tarefasFeitasHoje.ex2 = true;
+                        await salvarProgressoNuvem();
+                        fecharTelaBase('quiz-screen');
+                        window.abrirMenuDoDia();
+                    } else {
+                        renderizarQuiz();
+                    }
+                }, 1000);
+            } else {
+                botao.classList.replace('bg-[var(--gray-locked)]', 'bg-red-500');
+                botao.classList.replace('border-[var(--gray-locked-shadow)]', 'border-red-700');
+                setTimeout(() => {
+                    botao.classList.replace('bg-red-500', 'bg-[var(--gray-locked)]');
+                    botao.classList.replace('border-red-700', 'border-[var(--gray-locked-shadow)]');
+                    todosBotoes.forEach(b => b.style.pointerEvents = 'auto');
+                }, 1000);
+            }
+        }
+
+        // --- NAVEGAÇÃO E RESET ---
+        window.fecharTela = (id) => fecharTelaBase(id);
+        function fecharTelaBase(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('translate-y-0')) el.classList.replace('translate-y-0', 'translate-y-full');
+            else el.classList.replace('translate-x-0', 'translate-x-full');
+            el.classList.replace('opacity-100', 'opacity-0');
+        }
+
+        // Tocar e segurar o Mascote para Resetar
+        let resetTimer;
+        const btnReset = document.getElementById('btn-reset');
+        btnReset.addEventListener('touchstart', () => {
+            resetTimer = setTimeout(async () => {
+                if(confirm("Deseja realmente voltar para o Dia 1 e apagar seu progresso no Firebase?")) {
+                    appState.diaAtual = 1;
+                    appState.tarefasFeitasHoje = { ex1: false, ex2: false };
+                    await salvarProgressoNuvem();
+                    location.reload();
+                }
+            }, 2000);
+        });
+        btnReset.addEventListener('touchend', () => clearTimeout(resetTimer));
+
+        // Inicializa lendo do banco de dados na internet
+        carregarProgressoNuvem();
     </script>
 </body>
 </html>
