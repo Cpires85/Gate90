@@ -15,4 +15,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export { db, collection, getDocs, addDoc, updateDoc, doc, query, orderBy };
+// Agora exportamos corretamente o getDoc e setDoc para o index.html conseguir ler e gravar
+export { db, collection, getDocs, addDoc, updateDoc, doc, query, orderBy, getDoc, setDoc };
