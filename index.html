@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
     <style>
-        /* Cores exatas da interface de referência */
         :root {
             --bg-dark: #131F24;
             --green-main: #58CC02;
@@ -18,193 +17,234 @@
             --gray-locked: #37464F;
             --gray-locked-shadow: #202F36;
         }
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Nunito', 'Segoe UI', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { background-color: var(--bg-dark); color: white; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* Física do Cartão de Estudo (mantida da versão anterior) */
+        .perspective-1000 { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen relative overflow-hidden">
 
-    <!-- CABEÇALHO (Header de Estatísticas) -->
+    <!-- CABEÇALHO -->
     <header class="flex justify-between items-center p-4 sticky top-0 z-10 bg-[#131F24] border-b border-gray-800">
-        <!-- Mascote/Perfil -->
         <div class="w-10 h-10 rounded-full border-2 border-gray-700 overflow-hidden bg-white">
             <img src="151623.png" alt="Mascote" class="w-full h-full object-cover">
         </div>
-        
-        <!-- Status (Bandeira, Fogo, Cristais) -->
         <div class="flex items-center space-x-6 text-sm font-extrabold">
-            <!-- Bandeira EUA / Nível -->
-            <div class="flex items-center space-x-2 text-white">
-                <span class="text-xl">🇺🇸</span>
-                <span>1</span>
-            </div>
-            <!-- Ofensiva -->
-            <div class="flex items-center space-x-1 text-[#FF4B4B]">
+            <div class="flex items-center space-x-2 text-white"><span class="text-xl">🇺🇸</span><span>1</span></div>
+            <div class="flex items-center space-x-1 text-[var(--red-streak)]">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
-                <span>1</span>
-            </div>
-            <!-- Cristais/Gemas -->
-            <div class="flex items-center space-x-1 text-pink-400">
-                <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M12 2l3 9h9l-7.5 5.5 3 9-7.5-6-7.5 6 3-9L0 11h9z"/></svg>
-                <span>10</span>
+                <span id="streak-counter">1</span>
             </div>
         </div>
     </header>
 
-    <!-- TRILHA DE APRENDIZADO (Conteúdo Principal) -->
+    <!-- TRILHA DE APRENDIZADO -->
     <main class="flex-1 overflow-y-auto pb-24 relative flex flex-col items-center">
         
-        <!-- Cabeçalho da Seção (Caixa Verde) -->
-        <div class="w-11/12 max-w-md mt-6 p-4 rounded-2xl bg-[var(--green-main)] flex justify-between items-center shadow-lg relative">
+        <div class="w-11/12 max-w-md mt-6 p-4 rounded-2xl bg-[var(--green-main)] flex justify-between items-center shadow-lg">
             <div>
-                <p class="text-white/80 text-xs font-bold tracking-widest uppercase mb-1">Seção 1, Unidade 1</p>
-                <h2 class="text-white text-xl font-bold leading-tight">Sobrevivência no Aeroporto</h2>
+                <p class="text-white/80 text-xs font-bold tracking-widest uppercase mb-1">Bloco 1</p>
+                <h2 class="text-white text-xl font-bold leading-tight">Imigração e Aeroporto</h2>
             </div>
-            <button class="bg-white/20 p-2 rounded-xl">
-                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-            </button>
         </div>
 
-        <!-- Caminho (Nós em Zigue-Zague) -->
-        <div class="mt-8 flex flex-col items-center gap-4 w-full">
+        <!-- Caminho (Nós) -->
+        <div class="mt-10 flex flex-col items-center gap-6 w-full">
             
-            <!-- Nó 1 (Concluído) -->
+            <!-- DIA 1 (Concluído) -->
             <div class="translate-x-[-30px]">
                 <button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white relative">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <!-- Ícone de Check para dias completos -->
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
                 </button>
             </div>
 
-            <!-- Nó 2 (Concluído) -->
-            <div class="translate-x-[20px]">
-                <button class="w-[70px] h-[70px] rounded-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] flex items-center justify-center text-white relative">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                </button>
-            </div>
-
-            <!-- Nó 3 (ATIVO) -->
-            <div class="translate-x-[-10px] mt-6 relative" id="active-node">
-                <!-- Tooltip CONTINUAR flutuante -->
+            <!-- DIA 2 (ATIVO E PULSANDO) -->
+            <div class="translate-x-[20px] mt-2 relative" id="active-node">
                 <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#37464F] border border-gray-600 text-[var(--green-main)] text-sm font-extrabold uppercase tracking-widest px-4 py-2 rounded-xl whitespace-nowrap animate-bounce shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent after:border-t-[#37464F]">
-                    Continuar
+                    Dia 2
                 </div>
-                
-                <!-- Circulo Ativo -->
-                <button onclick="abrirTelaOfensiva()" class="w-[85px] h-[85px] rounded-full bg-[var(--green-main)] border-b-[8px] border-[var(--green-shadow)] flex items-center justify-center text-white relative ring-4 ring-white/10 shadow-2xl transition-transform active:translate-y-1 active:border-b-0">
-                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <!-- Botão com o número do Dia -->
+                <button onclick="abrirMenuDoDia()" class="w-[85px] h-[85px] rounded-full bg-[var(--green-main)] border-b-[8px] border-[var(--green-shadow)] flex items-center justify-center text-white text-3xl font-black relative ring-4 ring-white/10 shadow-2xl transition-transform active:translate-y-1 active:border-b-0">
+                    2
                 </button>
-                
-                <!-- Circulo brilhante atrás -->
                 <div class="absolute inset-0 rounded-full bg-[var(--green-main)] opacity-30 animate-ping -z-10"></div>
             </div>
 
-            <!-- Nó 4 (Bloqueado) -->
-            <div class="translate-x-[40px] mt-6">
-                <button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] flex items-center justify-center text-gray-500 relative">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            <!-- DIA 3 (Bloqueado / Cinza) -->
+            <div class="translate-x-[-15px] mt-6">
+                <button class="w-[70px] h-[70px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] flex items-center justify-center text-gray-500 text-2xl font-black relative cursor-not-allowed">
+                    3
+                </button>
+            </div>
+
+            <!-- DIA 4 (Revisão/Baú - Bloqueado) -->
+            <div class="translate-x-[35px] mt-6 relative">
+                <!-- Ícone de Baú/Revisão -->
+                <button class="w-[75px] h-[75px] rounded-full bg-[var(--gray-locked)] border-b-[6px] border-[var(--gray-locked-shadow)] flex items-center justify-center text-gray-500 relative cursor-not-allowed">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z"/><path d="M12 14.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm0-3c-.28 0-.5.22-.5.5s.22.5.5.5.5-.22.5-.5-.22-.5-.5-.5z"/></svg>
                 </button>
             </div>
             
         </div>
     </main>
 
-    <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
-    <nav class="fixed bottom-0 w-full bg-[#131F24] border-t-2 border-gray-800 flex justify-around items-center p-3 pb-safe-area">
-        <button class="text-[var(--green-main)] flex flex-col items-center p-2 border-2 border-[var(--green-main)] bg-[var(--green-main)]/10 rounded-xl">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </button>
-        <button class="text-gray-500 hover:text-white transition">
-            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-        </button>
-        <button class="text-gray-500 hover:text-white transition">
-            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        </button>
-        <button class="text-gray-500 hover:text-white transition">
-            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </button>
-    </nav>
-
-
-    <!-- TELA DE COMEMORAÇÃO DA OFENSIVA (Modal em Tela Cheia) -->
-    <div id="streak-screen" class="fixed inset-0 bg-[#131F24] z-50 flex flex-col items-center justify-between py-12 px-4 transition-all duration-300 translate-y-full opacity-0 pointer-events-none">
-        
-        <div class="flex-1 flex flex-col items-center justify-center w-full">
-            <!-- Ícone Gigante do Fogo -->
-            <div class="relative w-40 h-40 mb-2">
-                <svg viewBox="0 0 24 24" fill="var(--red-streak)" class="w-full h-full drop-shadow-2xl">
-                    <path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/>
-                </svg>
-                <!-- Chama branca no meio -->
-                <div class="absolute inset-0 flex items-center justify-center pt-8">
-                    <div class="w-12 h-12 bg-white rounded-full blur-sm opacity-90"></div>
-                </div>
-            </div>
-
-            <!-- Número e Texto da Ofensiva -->
-            <h1 class="text-7xl font-black text-[var(--red-streak)] tracking-tighter drop-shadow-lg">1</h1>
-            <p class="text-2xl font-bold text-[var(--red-streak)] mt-2 mb-10">dias de ofensiva</p>
-
-            <!-- Calendário Semanal -->
-            <div class="flex justify-center items-center space-x-3 w-full mb-8">
-                <!-- Dia Marcado -->
-                <div class="flex flex-col items-center">
-                    <span class="text-xs text-[var(--red-streak)] font-bold mb-2">Sáb</span>
-                    <div class="w-11 h-11 rounded-full bg-gradient-to-b from-[#FF9800] to-[var(--red-streak)] flex items-center justify-center text-white border-2 border-transparent ring-2 ring-[var(--red-streak)]">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                </div>
-                <!-- Dia Marcado (Hoje) -->
-                <div class="flex flex-col items-center relative">
-                    <span class="text-xs text-[var(--red-streak)] font-bold mb-2">Dom</span>
-                    <div class="w-11 h-11 rounded-full bg-gradient-to-b from-[#FF9800] to-[var(--red-streak)] flex items-center justify-center text-white border-2 border-transparent ring-2 ring-[var(--red-streak)] shadow-[0_0_15px_rgba(255,75,75,0.6)]">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                </div>
-                <!-- Dias Vazios -->
-                <div class="flex flex-col items-center">
-                    <span class="text-xs text-gray-500 font-bold mb-2">Seg</span>
-                    <div class="w-11 h-11 rounded-full bg-[var(--gray-locked)]"></div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-xs text-gray-500 font-bold mb-2">Ter</span>
-                    <div class="w-11 h-11 rounded-full bg-[var(--gray-locked)]"></div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-xs text-gray-500 font-bold mb-2">Qua</span>
-                    <div class="w-11 h-11 rounded-full bg-[var(--gray-locked)]"></div>
-                </div>
-            </div>
-
-            <p class="text-gray-300 font-medium text-center text-sm px-8">Isso que é arrasar na meta de aprendizado!<br>Não perca o ritmo!</p>
+    <!-- TELA 1: MENU DE TAREFAS DO DIA (Abre ao clicar no Dia Ativo) -->
+    <div id="daily-menu" class="fixed inset-0 bg-[#131F24] z-30 flex flex-col transition-transform duration-300 translate-y-full opacity-0">
+        <div class="p-6 flex justify-between items-center border-b border-gray-800">
+            <h2 class="text-2xl font-bold text-white">Tarefas: Dia 2</h2>
+            <button onclick="fecharMenuDoDia()" class="text-gray-400 p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
+        
+        <div class="flex-1 p-6 space-y-4 overflow-y-auto">
+            <p class="text-gray-400 text-sm mb-6">Complete as 3 etapas abaixo nas próximas 24h para não perder sua ofensiva e voltar ao Dia 1.</p>
+            
+            <!-- Tarefa 1: Flashcards -->
+            <button onclick="abrirFlashcards()" class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between active:translate-y-1 active:border-b-0 transition-all">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-[var(--blue-main)] p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-white">1. Cards de Pronúncia</h3>
+                        <p class="text-xs text-gray-400">Deslize e treine a fala (5 cards)</p>
+                    </div>
+                </div>
+                <div id="status-t1" class="text-gray-500 font-bold">COMEÇAR</div>
+            </button>
 
-        <!-- Botão VAI CPIRES -->
+            <!-- Tarefa 2: Imersão (Listening) -->
+            <button class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between active:translate-y-1 active:border-b-0 transition-all">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-purple-500 p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v9.28a4.39 4.39 0 0 0-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg></div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-white">2. Imersão Guiada</h3>
+                        <p class="text-xs text-gray-400">Ouça o áudio no aeroporto</p>
+                    </div>
+                </div>
+                <div class="text-gray-500 font-bold">COMEÇAR</div>
+            </button>
+
+            <!-- Tarefa 3: Shadowing -->
+            <button class="w-full bg-[var(--gray-locked)] border-b-4 border-[var(--gray-locked-shadow)] p-4 rounded-2xl flex items-center justify-between active:translate-y-1 active:border-b-0 transition-all">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-orange-500 p-3 rounded-xl"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-white">3. Shadowing (Falar)</h3>
+                        <p class="text-xs text-gray-400">Repita a frase do oficial</p>
+                    </div>
+                </div>
+                <div class="text-gray-500 font-bold">COMEÇAR</div>
+            </button>
+        </div>
+        
+        <!-- Botão Finalizar Dia (Fica verde quando as 3 tarefas terminam) -->
+        <div class="p-6 bg-[#131F24] border-t border-gray-800">
+            <button onclick="finalizarDia()" class="w-full bg-[var(--green-main)] border-b-[6px] border-[var(--green-shadow)] rounded-2xl py-4 text-white font-extrabold text-lg uppercase tracking-wider active:translate-y-1 active:border-b-0 transition-all">
+                Concluir Dia 2
+            </button>
+        </div>
+    </div>
+
+    <!-- TELA 2: FLASHCARDS (O exercício real que construímos) -->
+    <div id="flashcard-screen" class="fixed inset-0 bg-white dark:bg-[#131F24] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0">
+        <div class="p-4 flex justify-between items-center border-b border-gray-800">
+            <button onclick="fecharFlashcards()" class="text-gray-400"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+            <div class="w-full mx-4 h-3 bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-[var(--green-main)] w-1/5 rounded-full"></div>
+            </div>
+        </div>
+        <div class="flex-1 flex items-center justify-center p-6 relative perspective-1000">
+            <!-- Cartão -->
+            <div id="flashcard" class="w-full max-w-sm h-[350px] bg-[var(--gray-locked)] rounded-3xl shadow-xl border border-gray-700 p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 absolute relative">
+                
+                <!-- Frente -->
+                <div id="card-front" class="w-full">
+                    <p class="text-gray-400 text-sm mb-4 uppercase tracking-widest font-bold">Traduza para o inglês</p>
+                    <h2 class="text-2xl font-bold text-white leading-tight">"Pedir uma mesa para você, sua esposa e sua filha."</h2>
+                    <p class="text-sm text-[var(--blue-main)] mt-8 animate-pulse font-bold">Toque para revelar</p>
+                </div>
+
+                <!-- Verso -->
+                <div id="card-back" class="w-full hidden">
+                    <h2 class="text-3xl font-black text-[var(--green-main)] mb-4">"A table for three, please."</h2>
+                    <p class="text-gray-400 text-sm italic bg-[#131F24] px-4 py-3 rounded-xl border border-gray-800">A tei-bôu fór tri, plíz.</p>
+                    <div class="flex justify-between w-full mt-10 text-sm font-bold text-gray-500 uppercase">
+                        <span>&larr; Errei</span>
+                        <span>Fácil &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 3: COMEMORAÇÃO DE OFENSIVA -->
+    <div id="streak-screen" class="fixed inset-0 bg-[#131F24] z-50 flex flex-col items-center justify-between py-12 px-4 transition-all duration-300 translate-y-full opacity-0 pointer-events-none">
+        <div class="flex-1 flex flex-col items-center justify-center w-full">
+            <div class="relative w-40 h-40 mb-2">
+                <svg viewBox="0 0 24 24" fill="var(--red-streak)" class="w-full h-full drop-shadow-2xl"><path d="M11.66 22q-2.4 0-4.22-1.52T5.62 16.5q0-1.74.88-3.08t2.25-2.2q.21-.14.4-.33t.34-.41q.85-1.09 1.13-2.58.12-.66.07-1.39-.02-.33.19-.52.22-.2.53-.08 1.34.48 2.21 1.4.88.93 1.35 2.16.48 1.23.48 2.65 0 2.95-2.07 5.01T11.66 22Z"/></svg>
+                <div class="absolute inset-0 flex items-center justify-center pt-8"><div class="w-12 h-12 bg-white rounded-full blur-sm opacity-90"></div></div>
+            </div>
+            <h1 class="text-7xl font-black text-[var(--red-streak)] tracking-tighter drop-shadow-lg">2</h1>
+            <p class="text-2xl font-bold text-[var(--red-streak)] mt-2 mb-10">dias de ofensiva</p>
+            <p class="text-gray-300 font-medium text-center text-sm px-8">Isso que é arrasar na meta de aprendizado!<br>O Dia 3 foi desbloqueado!</p>
+        </div>
         <button onclick="fecharTelaOfensiva()" class="w-full max-w-sm bg-[var(--blue-main)] border-b-[6px] border-[var(--blue-shadow)] rounded-2xl py-4 text-white font-extrabold text-lg uppercase tracking-wider active:translate-y-1 active:border-b-0 transition-all">
             VAI, CPIRES85!
         </button>
     </div>
 
-    <!-- Script para demonstrar a tela de fogo -->
+    <!-- Navegação Inferior -->
+    <nav class="fixed bottom-0 w-full bg-[#131F24] border-t-2 border-gray-800 flex justify-around items-center p-3 z-0">
+        <!-- Ícones da nav mantidos -->
+        <button class="text-[var(--green-main)] p-2 bg-[var(--green-main)]/10 rounded-xl"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+        <button class="text-gray-500 hover:text-white transition"><svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg></button>
+    </nav>
+
+    <!-- Scripts de Fluxo Visual -->
     <script>
-        const telaOfensiva = document.getElementById('streak-screen');
+        const dailyMenu = document.getElementById('daily-menu');
+        const flashcardScreen = document.getElementById('flashcard-screen');
+        const streakScreen = document.getElementById('streak-screen');
 
-        // Abre a tela imitando uma transição suave de baixo para cima
-        function abrirTelaOfensiva() {
-            telaOfensiva.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
-            telaOfensiva.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        // Navegação das Telas
+        function abrirMenuDoDia() { dailyMenu.classList.replace('translate-y-full', 'translate-y-0'); dailyMenu.classList.replace('opacity-0', 'opacity-100'); }
+        function fecharMenuDoDia() { dailyMenu.classList.replace('translate-y-0', 'translate-y-full'); dailyMenu.classList.replace('opacity-100', 'opacity-0'); }
+        
+        function abrirFlashcards() { flashcardScreen.classList.replace('translate-x-full', 'translate-x-0'); flashcardScreen.classList.replace('opacity-0', 'opacity-100'); }
+        function fecharFlashcards() { 
+            flashcardScreen.classList.replace('translate-x-0', 'translate-x-full'); flashcardScreen.classList.replace('opacity-100', 'opacity-0');
+            // Simula conclusão da primeira tarefa
+            document.getElementById('status-t1').innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>';
         }
 
-        // Fecha a tela ao clicar em "VAI, CPIRES85!"
+        function finalizarDia() {
+            fecharMenuDoDia();
+            streakScreen.classList.replace('translate-y-full', 'translate-y-0');
+            streakScreen.classList.replace('opacity-0', 'opacity-100');
+            streakScreen.classList.replace('pointer-events-none', 'pointer-events-auto');
+        }
+
         function fecharTelaOfensiva() {
-            telaOfensiva.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
-            telaOfensiva.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            
-            // Aqui futuramente será chamado a sua função que exibe os Flashcards (card-front/card-back)
+            streakScreen.classList.replace('translate-y-0', 'translate-y-full');
+            streakScreen.classList.replace('opacity-100', 'opacity-0');
+            streakScreen.classList.replace('pointer-events-auto', 'pointer-events-none');
+            // Aqui (no futuro app.js) o Dia 3 mudaria de cinza para verde, liberando o próximo nível.
         }
+
+        // Lógica simples de virar o card do Flashcard
+        const flashcard = document.getElementById('flashcard');
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+        let virado = false;
+
+        flashcard.addEventListener('click', () => {
+            if (!virado) {
+                cardFront.classList.add('hidden');
+                cardBack.classList.remove('hidden');
+                virado = true;
+            }
+        });
     </script>
 </body>
 </html>
