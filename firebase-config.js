@@ -4,12 +4,12 @@ import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, order
 
 // Substitua com as chaves do seu novo projeto Gate90 no Firebase Console
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "gate90-app.firebaseapp.com",
-  projectId: "gate90-app",
-  storageBucket: "gate90-app.appspot.com",
-  messagingSenderId: "SEU_MESSAGING_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyCoPDNQzzka-c65080QzZCarpK7__kFZwQ",
+  authDomain: "gate90-f3bbd.firebaseapp.com",
+  projectId: "gate90-f3bbd",
+  storageBucket: "gate90-f3bbd.firebasestorage.app",
+  messagingSenderId: "91212411474",
+  appId: "1:91212411474:web:7a7a1a41eb2c09f522658b"
 };
 
 const app = initializeApp(firebaseConfig);
