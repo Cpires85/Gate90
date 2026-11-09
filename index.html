@@ -2,187 +2,217 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Gate90</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+        
         :root {
-            --bg-main: #0F161E;
-            --card-bg: #1A242D;
-            --green-main: #14C33B;
-            --green-glow: rgba(20, 195, 59, 0.3);
-            --orange-main: #FF8A00;
-            --orange-glow: rgba(255, 138, 0, 0.4);
-            --text-muted: #8E9BAE;
+            --bg-light: #F2F7FF;
+            --primary-blue: #007AFF;
+            --secondary-blue: #00B4DB;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --green-success: #22C55E;
+            --orange-prova: #FF9500;
         }
-        body { background-color: var(--bg-main); color: white; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-light); color: var(--text-dark); font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .perspective-1000 { perspective: 1000px; }
         #flashcard { touch-action: none; transition-property: transform, opacity, border-color; }
         
-        /* Brilhos baseados na imagem */
-        .glow-green { box-shadow: 0 0 20px var(--green-glow); }
-        .glow-orange { box-shadow: 0 0 25px var(--orange-glow); }
-        .glow-orange-border { box-shadow: 0 0 15px var(--orange-glow), inset 0 0 10px var(--orange-glow); border-color: var(--orange-main); }
+        /* Física visual dos cards de exercício */
+        .card-drag-right { border-color: var(--green-success) !important; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+        .card-drag-left { border-color: #EF4444 !important; box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
         
-        /* Cores de feedback do Flashcard */
-        .card-drag-right { border-color: var(--green-main) !important; box-shadow: 0 0 20px var(--green-glow); }
-        .card-drag-left { border-color: #FF4B4B !important; box-shadow: 0 0 20px rgba(255, 75, 75, 0.2); }
+        /* Gradiente do Cabeçalho Fixo */
+        .header-gradient { background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%); }
+        .text-shadow-title { text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
+        /* Animação Circular da Barra de Progresso */
+        .progress-ring__circle { transition: stroke-dashoffset 0.5s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%; }
     </style>
 </head>
 <body class="flex flex-col h-screen relative overflow-hidden">
 
-    <!-- CABEÇALHO SUPERIOR -->
-    <header class="flex justify-between items-center p-5 sticky top-0 z-20 bg-[var(--bg-main)]">
-        <!-- Ícone Menu Hamburger (Abre Configurações) -->
-        <button onclick="abrirConfiguracoes()" class="text-white active:scale-90 transition-transform">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-        </button>
-        <h1 class="text-lg font-bold">Nosso Desafio</h1>
-        <!-- Ícone Sino Notificação -->
-        <button class="text-white relative active:scale-90 transition-transform">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-[var(--bg-main)]"></div>
-        </button>
-    </header>
-
-    <!-- MENU LATERAL DE CONFIGURAÇÕES (Reset) -->
-    <div id="settings-menu" class="fixed inset-0 z-50 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="settings-sidebar" class="absolute top-0 left-0 w-3/4 max-w-sm h-full bg-[var(--card-bg)] shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col">
-            <div class="p-6 border-b border-gray-800 flex justify-between items-center">
-                <h2 class="text-xl font-bold">Configurações</h2>
-                <button onclick="fecharConfiguracoes()" class="text-gray-400 p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <div class="p-6 flex-1">
-                <p class="text-sm text-[var(--text-muted)] mb-6">Opções de desenvolvedor</p>
-                <button onclick="resetarApp()" class="w-full bg-red-600/10 border border-red-600 text-red-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:bg-red-600 active:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    Resetar Progresso Total
+    <!-- ÁREA FIXA NO TOPO (Não rola) -->
+    <div class="w-full shrink-0 z-20 flex flex-col shadow-sm bg-[var(--bg-light)]">
+        
+        <!-- HEADER AZUL GRADIENTE -->
+        <div class="header-gradient w-full rounded-b-[30px] pt-4 pb-6 px-5 relative overflow-hidden shadow-md">
+            
+            <!-- Linha 1: Menu e Títulos -->
+            <div class="flex justify-between items-start w-full relative z-10">
+                <!-- Botão Menu Hamburger -->
+                <button onclick="abrirConfiguracoes()" class="text-white active:scale-90 transition-transform p-1">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
+                
+                <!-- Textos alinhados à direita -->
+                <div class="text-right">
+                    <h1 class="text-white font-black text-2xl tracking-tight text-shadow-title">Nosso Desafio</h1>
+                    <p class="text-blue-100 text-[11px] font-semibold leading-tight mt-0.5">Disciplina hoje,<br>conquistas sempre! 💪</p>
+                </div>
+            </div>
+
+            <!-- Linha 2: Mascote e Logo 90 Dias -->
+            <div class="flex justify-between items-end w-full mt-2 relative z-10 h-24">
+                <!-- Mascote -->
+                <img src="151623.png" alt="Mascote" class="w-28 h-28 object-contain drop-shadow-2xl absolute -bottom-8 -left-2 transform rotate-2">
+                
+                <!-- Letreiro Desafio 90 Dias -->
+                <div class="ml-auto text-right mb-2">
+                    <div class="text-white font-black text-2xl italic tracking-tighter drop-shadow-md leading-none">Desafio</div>
+                    <div class="text-[#FFDE00] font-black text-4xl italic tracking-tighter drop-shadow-lg leading-none" style="text-shadow: 0px 3px 0px #B27000, 0px 5px 10px rgba(0,0,0,0.4);">90 Dias</div>
+                </div>
+            </div>
+            
+            <!-- Efeitos de Fundo no Azul -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+                <div class="absolute top-[-50px] right-[-50px] w-40 h-40 bg-white rounded-full blur-3xl"></div>
+                <div class="absolute bottom-[-50px] left-[-20px] w-32 h-32 bg-white rounded-full blur-2xl"></div>
+            </div>
+        </div>
+
+        <!-- PAINÉIS BRANCOS FLUTUANTES (Progresso e Tempo) -->
+        <div class="px-5 w-full -mt-4 relative z-20 flex flex-col gap-3 pb-3">
+            
+            <!-- Painel 1: Progresso Circular e Conquistas -->
+            <div class="bg-white rounded-2xl p-4 shadow-lg flex items-center justify-between border border-gray-100">
+                <!-- Circulo Progresso -->
+                <div class="flex items-center gap-3">
+                    <div class="relative w-14 h-14 flex items-center justify-center">
+                        <svg class="w-14 h-14 absolute top-0 left-0">
+                            <!-- Fundo Cinza -->
+                            <circle class="text-gray-100" stroke-width="5" stroke="currentColor" fill="transparent" r="24" cx="28" cy="28"/>
+                            <!-- Anel Azul Preenchido -->
+                            <circle id="progress-ring" class="text-[var(--primary-blue)] progress-ring__circle" stroke-width="5" stroke-linecap="round" stroke="currentColor" fill="transparent" r="24" cx="28" cy="28" stroke-dasharray="150" stroke-dashoffset="150"/>
+                        </svg>
+                        <span id="progress-text" class="text-xs font-black text-[#1E293B] absolute z-10">0%</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-[var(--text-muted)] font-bold">Você já concluiu</p>
+                        <p class="text-[10px] text-[#1E293B] font-bold"><span id="progress-days" class="text-lg font-black text-[var(--primary-blue)]">0</span> de 90 dias</p>
+                    </div>
+                </div>
+                
+                <!-- Divisória -->
+                <div class="h-10 w-[1px] bg-gray-200 mx-2"></div>
+                
+                <!-- Troféu -->
+                <div class="flex flex-col items-center justify-center cursor-pointer active:scale-95" onclick="abrirTelaOfensiva()">
+                    <span class="text-2xl drop-shadow-sm">🏆</span>
+                    <p class="text-[10px] font-bold text-[#1E293B]"><span id="streak-counter-top" class="text-sm font-black text-[#D97706]">1</span> Conquistas</p>
+                </div>
+            </div>
+
+            <!-- Painel 2: Tempo e Dia Atual -->
+            <div class="bg-white rounded-2xl p-4 shadow-lg flex justify-between items-center border border-gray-100">
+                <!-- Cronômetro -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-[var(--text-muted)] font-bold">Tempo Restante</p>
+                        <p id="countdown-timer" class="text-lg font-black text-[#1E293B] tracking-tight">24:00:00</p>
+                    </div>
+                </div>
+                <!-- Divisória -->
+                <div class="h-8 w-[1px] bg-gray-200"></div>
+                <!-- Calendário -->
+                <div class="flex items-center gap-2">
+                    <svg class="w-6 h-6 text-[var(--primary-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <div>
+                        <p class="text-[10px] text-[var(--text-muted)] font-bold">Dia Atual</p>
+                        <div class="bg-blue-100 text-[var(--primary-blue)] text-[10px] font-black px-2 py-0.5 rounded-full" id="dia-atual-badge">Dia 1</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ÁREA PRINCIPAL ROLÁVEL -->
-    <main class="flex-1 overflow-y-auto px-5 pb-28" id="scroll-area">
-        
-        <!-- BANNER HERO (Desafio 90 Dias) -->
-        <div class="w-full relative mt-2 mb-6 p-6 rounded-3xl overflow-hidden flex items-center justify-between" style="background: radial-gradient(circle at top left, rgba(20,195,59,0.2) 0%, transparent 70%);">
-            <!-- Icone Calendario 3D Simulado -->
-            <div class="relative w-24 h-28 flex-shrink-0 z-10">
-                <div class="absolute inset-0 bg-white rounded-xl shadow-lg border-b-8 border-orange-400 transform -rotate-6 flex flex-col items-center justify-center">
-                    <div class="absolute top-0 w-full h-6 bg-green-500 rounded-t-xl flex justify-around items-center px-2">
-                        <div class="w-2 h-4 bg-gray-300 rounded-full shadow-inner transform -translate-y-2"></div>
-                        <div class="w-2 h-4 bg-gray-300 rounded-full shadow-inner transform -translate-y-2"></div>
-                    </div>
-                    <span class="text-4xl font-black text-green-600 mt-2">90</span>
-                    <span class="text-[10px] font-bold text-gray-500 uppercase">Dias</span>
-                </div>
-                <!-- Símbolo de Check Verde flutuante -->
-                <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-[var(--green-main)] rounded-full border-4 border-[var(--bg-main)] flex items-center justify-center shadow-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                </div>
+    <!-- MENU LATERAL DE CONFIGURAÇÕES (Reset) -->
+    <div id="settings-menu" class="fixed inset-0 z-50 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm">
+        <div id="settings-sidebar" class="absolute top-0 left-0 w-4/5 max-w-sm h-full bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-[#F8FAFC]">
+                <h2 class="text-xl font-black text-[#1E293B]">Configurações</h2>
+                <button onclick="fecharConfiguracoes()" class="text-gray-400 p-2 active:scale-90 bg-white rounded-full shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            
-            <div class="ml-4 z-10">
-                <h3 class="text-white font-black text-3xl leading-tight">Desafio<br><span class="text-[var(--green-main)]">90 Dias</span></h3>
-                <p class="text-[var(--text-muted)] text-sm mt-2 leading-tight">Disciplina hoje,<br>conquistas sempre! 💪</p>
+            <div class="p-6 flex-1 bg-white">
+                <p class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4">Opções de Desenvolvedor</p>
+                <button onclick="resetarApp()" class="w-full bg-red-50 border border-red-200 text-red-600 font-bold py-4 rounded-xl flex items-center justify-center gap-2 active:bg-red-600 active:text-white transition-colors shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Resetar Progresso Total
+                </button>
+                <p class="text-[10px] text-gray-400 mt-3 text-center">Isso apagará o progresso e voltará ao Dia 1.</p>
             </div>
         </div>
+    </div>
 
-        <!-- DASHBOARD: TEMPO E CONQUISTAS -->
-        <div class="w-full bg-[var(--card-bg)] rounded-3xl p-5 mb-8 flex justify-between items-center shadow-lg border border-gray-800/50">
-            <!-- Cronômetro -->
-            <div class="flex items-center gap-3 w-1/2">
-                <div class="w-10 h-10 rounded-full border-2 border-[var(--green-main)] flex items-center justify-center text-[var(--green-main)]">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div>
-                    <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">Tempo Restante</p>
-                    <p id="countdown-timer" class="text-xl font-bold text-white tracking-wider">24:00:00</p>
-                </div>
-            </div>
-            
-            <!-- Divisória -->
-            <div class="h-10 w-px bg-gray-700 mx-2"></div>
-            
-            <!-- Conquistas (Ofensiva) -->
-            <div class="flex items-center gap-3 w-1/2 justify-center" onclick="abrirTelaOfensiva()">
-                <div>
-                    <div class="flex items-center gap-1">
-                        <span class="text-2xl">🔥</span>
-                        <span id="streak-counter" class="text-2xl font-bold text-white">1</span>
-                    </div>
-                    <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold text-center">Conquistas</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- LINHA DO TEMPO (TRILHA VERTICAL) -->
-        <div id="trail-container" class="w-full flex flex-col relative">
+    <!-- ÁREA PRINCIPAL ROLÁVEL (A Linha do Tempo) -->
+    <main class="flex-1 overflow-y-auto px-5 pb-28 pt-4 w-full" id="scroll-area">
+        <div id="trail-container" class="w-full flex flex-col relative max-w-lg mx-auto">
             <!-- Os cards dos dias serão gerados aqui pelo JavaScript -->
         </div>
-
     </main>
 
     <!-- NAVEGAÇÃO INFERIOR -->
-    <nav class="fixed bottom-0 w-full bg-[var(--card-bg)] border-t border-gray-800 flex justify-around items-center p-3 pb-safe z-30 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <!-- Botão Início (Ativo - Pílula Verde) -->
-        <button onclick="fecharTodasAsTelas()" class="bg-[var(--green-main)] text-white px-6 py-2 rounded-full flex flex-col items-center shadow-lg active:scale-95 transition-transform">
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around items-center p-3 pb-safe z-30 rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <button onclick="fecharTodasAsTelas()" class="flex flex-col items-center active:scale-95 transition-transform text-[var(--primary-blue)]">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span class="text-[10px] font-bold">Início</span>
         </button>
-        <!-- Botão Conquistas -->
-        <button onclick="abrirTelaOfensiva()" class="text-[var(--text-muted)] hover:text-white flex flex-col items-center active:scale-95 transition-colors">
+        <button onclick="abrirTelaOfensiva()" class="text-gray-400 hover:text-[var(--primary-blue)] flex flex-col items-center active:scale-95 transition-colors">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
             <span class="text-[10px] font-bold">Conquistas</span>
         </button>
-        <!-- Botão Perfil (Sem ação no momento) -->
-        <button class="text-[var(--text-muted)] hover:text-white flex flex-col items-center active:scale-95 transition-colors">
-            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <button class="text-gray-400 hover:text-[var(--primary-blue)] flex flex-col items-center active:scale-95 transition-colors">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
             <span class="text-[10px] font-bold">Perfil</span>
         </button>
     </nav>
 
-    <!-- MODAIS E TELAS SECUNDÁRIAS ABAIXO -->
+    <!-- MODAIS DE EXERCÍCIOS (TEMA CLARO) -->
     
     <!-- MENU DE TAREFAS DO DIA -->
-    <div id="daily-menu" class="fixed inset-0 bg-[var(--bg-main)] z-40 flex flex-col transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
-        <div class="p-6 flex justify-between items-center border-b border-gray-800">
-            <h2 id="menu-title" class="text-2xl font-bold text-white">Tarefas: Dia X</h2>
-            <button onclick="fecharTela('daily-menu')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="daily-menu" class="fixed inset-0 bg-[var(--bg-light)] z-40 flex flex-col transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
+        <div class="p-6 flex justify-between items-center border-b border-gray-200 bg-white">
+            <h2 id="menu-title" class="text-2xl font-black text-[#1E293B]">Tarefas: Dia X</h2>
+            <button onclick="fecharTela('daily-menu')" class="text-gray-400 p-2 active:scale-90 bg-gray-100 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         <div class="flex-1 p-6 space-y-4 overflow-y-auto" id="menu-tasks-container">
             <!-- Botões gerados pelo JS -->
         </div>
-        <div class="p-6 border-t border-gray-800 bg-[var(--card-bg)]">
-            <button id="btn-concluir-dia" onclick="concluirDia()" class="w-full bg-[var(--card-bg)] text-gray-500 border-2 border-gray-700 rounded-2xl py-4 font-extrabold text-lg uppercase tracking-wider transition-all pointer-events-none">
+        <div class="p-6 border-t border-gray-200 bg-white">
+            <button id="btn-concluir-dia" onclick="concluirDia()" class="w-full bg-gray-100 text-gray-400 rounded-2xl py-4 font-black text-lg uppercase tracking-wider transition-all pointer-events-none">
                 Terminar Exercícios
             </button>
         </div>
     </div>
 
     <!-- TELA: FLASHCARDS -->
-    <div id="flashcard-screen" class="fixed inset-0 bg-[var(--bg-main)] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
-        <div class="p-4 flex justify-between items-center border-b border-gray-800">
-            <button onclick="fecharTela('flashcard-screen')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-            <div class="text-gray-400 font-bold bg-[var(--card-bg)] px-4 py-1 rounded-full" id="fc-counter">1/10</div>
+    <div id="flashcard-screen" class="fixed inset-0 bg-[var(--bg-light)] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
+        <div class="p-4 flex justify-between items-center border-b border-gray-200 bg-white">
+            <button onclick="fecharTela('flashcard-screen')" class="text-gray-400 p-2 active:scale-90 bg-gray-100 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></button>
+            <div class="text-[#1E293B] font-black bg-blue-50 text-[var(--primary-blue)] px-4 py-1.5 rounded-full text-sm" id="fc-counter">1/10</div>
         </div>
         <div class="flex-1 flex items-center justify-center p-6 w-full relative perspective-1000 overflow-hidden">
-            <div id="flashcard" class="w-full max-w-sm h-[400px] bg-[var(--card-bg)] rounded-3xl shadow-2xl border-4 border-transparent p-6 flex flex-col items-center justify-center text-center transition-transform duration-200 cursor-grab relative">
+            <div id="flashcard" class="w-full max-w-sm h-[400px] bg-white rounded-3xl shadow-xl border-4 border-transparent p-6 flex flex-col items-center justify-center text-center transition-transform duration-200 cursor-grab relative">
                 <div id="card-front" class="w-full h-full flex flex-col items-center justify-center">
-                    <p class="text-[var(--text-muted)] text-sm mb-4 uppercase tracking-widest font-bold">Como você diria?</p>
-                    <h2 id="fc-frente" class="text-2xl font-bold text-white leading-tight">...</h2>
-                    <button class="mt-8 bg-[var(--green-main)] text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest shadow-lg animate-pulse active:scale-95 transition-transform" onclick="virarCard()">Revelar Resposta</button>
+                    <p class="text-gray-400 text-sm mb-4 uppercase tracking-widest font-black">Como você diria?</p>
+                    <h2 id="fc-frente" class="text-2xl font-black text-[#1E293B] leading-tight">...</h2>
+                    <button class="mt-8 bg-[var(--primary-blue)] text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest shadow-md animate-pulse active:scale-95 transition-transform" onclick="virarCard()">Revelar Resposta</button>
                 </div>
                 <div id="card-back" class="w-full h-full flex flex-col items-center justify-center hidden">
-                    <h2 id="fc-verso" class="text-3xl font-black text-[var(--green-main)] mb-4">...</h2>
-                    <p id="fc-pronuncia" class="text-[var(--text-muted)] text-sm italic bg-[var(--bg-main)] px-4 py-3 rounded-xl border border-gray-800 mb-8">...</p>
-                    <p class="text-xs text-gray-500 mb-4 font-bold uppercase tracking-widest">Deslize o card ou use os botões</p>
+                    <h2 id="fc-verso" class="text-3xl font-black text-[var(--green-success)] mb-4">...</h2>
+                    <p id="fc-pronuncia" class="text-gray-500 text-sm italic bg-gray-50 px-4 py-3 rounded-xl border border-gray-100 mb-8">...</p>
+                    <p class="text-xs text-gray-400 mb-4 font-bold uppercase tracking-widest">Deslize o card ou use os botões</p>
                     <div class="flex justify-between w-full mt-auto gap-4">
-                        <button onclick="processarCard('errei')" class="flex-1 bg-[var(--bg-main)] border-2 border-red-500/50 text-red-400 font-bold py-4 rounded-2xl active:bg-red-500 active:text-white transition-colors">&larr; ERREI</button>
-                        <button onclick="processarCard('facil')" class="flex-1 bg-[var(--bg-main)] border-2 border-[var(--green-main)] text-[var(--green-main)] font-bold py-4 rounded-2xl active:bg-[var(--green-main)] active:text-white transition-colors">FÁCIL &rarr;</button>
+                        <button onclick="processarCard('errei')" class="flex-1 bg-red-50 border-2 border-red-200 text-red-500 font-black py-4 rounded-2xl active:bg-red-500 active:text-white transition-colors shadow-sm">&larr; ERREI</button>
+                        <button onclick="processarCard('facil')" class="flex-1 bg-green-50 border-2 border-green-200 text-green-600 font-black py-4 rounded-2xl active:bg-[var(--green-success)] active:text-white transition-colors shadow-sm">FÁCIL &rarr;</button>
                     </div>
                 </div>
             </div>
@@ -190,30 +220,31 @@
     </div>
 
     <!-- TELA: QUIZ / PROVA -->
-    <div id="quiz-screen" class="fixed inset-0 bg-[var(--bg-main)] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
-        <div class="p-4 flex justify-between items-center border-b border-gray-800">
-            <button onclick="fecharTela('quiz-screen')" class="text-gray-400 p-2 active:scale-90 transition-transform"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-            <div class="text-gray-400 font-bold bg-[var(--card-bg)] px-4 py-1 rounded-full" id="quiz-counter">1/10</div>
+    <div id="quiz-screen" class="fixed inset-0 bg-[var(--bg-light)] z-40 flex flex-col transition-transform duration-300 translate-x-full opacity-0 pointer-events-none">
+        <div class="p-4 flex justify-between items-center border-b border-gray-200 bg-white">
+            <button onclick="fecharTela('quiz-screen')" class="text-gray-400 p-2 active:scale-90 bg-gray-100 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></button>
+            <div class="text-[#1E293B] font-black bg-purple-50 text-purple-600 px-4 py-1.5 rounded-full text-sm" id="quiz-counter">1/10</div>
         </div>
         <div class="flex-1 p-6 flex flex-col overflow-y-auto">
-            <h2 class="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest text-center mt-2" id="quiz-tipo-titulo">Qual a tradução de:</h2>
-            <h1 id="quiz-pergunta" class="text-2xl font-black text-white text-center mt-4 mb-8 leading-tight">"..."</h1>
+            <h2 class="text-sm font-black text-gray-400 uppercase tracking-widest text-center mt-2" id="quiz-tipo-titulo">Qual a tradução de:</h2>
+            <h1 id="quiz-pergunta" class="text-2xl font-black text-[var(--primary-blue)] text-center mt-4 mb-8 leading-tight">"..."</h1>
             <div id="quiz-opcoes" class="flex flex-col gap-4 pb-8"></div>
         </div>
     </div>
 
     <!-- TELA: PROGRESSO / OFENSIVA -->
-    <div id="streak-screen" class="fixed inset-0 bg-[var(--bg-main)] z-50 flex flex-col items-center justify-between py-12 px-4 transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
+    <div id="streak-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-between py-12 px-4 transition-transform duration-300 translate-y-full opacity-0 pointer-events-none">
         <div class="w-full flex justify-end">
-            <button onclick="fecharTodasAsTelas()" class="text-gray-400 p-2 bg-[var(--card-bg)] rounded-full active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            <button onclick="fecharTodasAsTelas()" class="text-gray-500 p-2 bg-gray-100 rounded-full active:scale-90 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         <div class="flex-1 flex flex-col items-center justify-center w-full">
-            <div class="relative w-40 h-40 mb-2">
-                <span class="text-9xl drop-shadow-2xl animate-pulse">🔥</span>
+            <div class="relative w-40 h-40 mb-2 flex justify-center items-center">
+                <span class="text-9xl drop-shadow-2xl animate-pulse absolute z-10">🏆</span>
+                <div class="w-32 h-32 bg-yellow-200 rounded-full blur-xl opacity-60 absolute"></div>
             </div>
-            <h1 id="streak-screen-count" class="text-7xl font-black text-[var(--orange-main)] tracking-tighter drop-shadow-lg mt-4">1</h1>
-            <p class="text-2xl font-bold text-[var(--orange-main)] mt-2 mb-10">Conquistas</p>
-            <p class="text-gray-300 font-medium text-center text-sm px-8">Complete as tarefas diárias<br>para manter a chama acesa!</p>
+            <h1 id="streak-screen-count" class="text-7xl font-black text-yellow-500 tracking-tighter drop-shadow-md mt-4">1</h1>
+            <p class="text-2xl font-black text-yellow-500 mt-2 mb-10">Conquistas</p>
+            <p class="text-gray-500 font-bold text-center text-sm px-8 leading-relaxed">Complete as tarefas diárias<br>para manter sua evolução!</p>
         </div>
     </div>
 
@@ -227,7 +258,7 @@
         let dbRef = null;
         let userRef = null;
 
-        // BANCO DE DADOS EXPANDIDO
+        // BANCO DE DADOS
         const vocabularioMaster = [
             { en: "A table for three, please.", pt: "Uma mesa para três, por favor.", pronuncia: "A tei-bôu fór tri, plíz.", wrong: ["Gostaria de pagar a conta.", "Onde fica o banheiro?"] },
             { en: "Here are our passports.", pt: "Aqui estão nossos passaportes.", pronuncia: "Hír ár aour pás-pórts.", wrong: ["Nós perdemos o voo.", "Aqui está minha bagagem."] },
@@ -238,89 +269,100 @@
             { en: "The air conditioning isn't working.", pt: "O ar-condicionado não está funcionando.", pronuncia: "Dâ ér con-dí-xio-nin í-zãnt uôr-kin.", wrong: ["A televisão quebrou.", "A porta não abre."] },
             { en: "Could you take a picture of us?", pt: "Você poderia tirar uma foto nossa?", pronuncia: "Cúd iú têik a pík-tshur óv âs?", wrong: ["Posso tirar uma foto do castelo?", "Quanto custa essa foto?"] },
             { en: "I have a reservation under Pires.", pt: "Eu tenho uma reserva no nome de Pires.", pronuncia: "Ái hév a re-zâr-vei-xâ-n ân-dâr Pí-ris.", wrong: ["Preciso de um quarto duplo.", "Quero cancelar minha viagem."] },
-            { en: "My daughter wants to see Cinderella.", pt: "Minha filha quer ver a Cinderela.", pronuncia: "Mái dór-târ uónts tú sí Sin-dê-ré-la.", wrong: ["Onde compramos os ingressos?", "Nós já tiramos foto ali."] },
-            { en: "Can I have some tap water?", pt: "Você pode me dar água da torneira (grátis)?", pronuncia: "Kén ái hév sâm tép uó-târ?", wrong: ["Onde posso comprar água?", "A água está muito gelada."] },
-            { en: "What time is the parade?", pt: "A que horas é o desfile?", pronuncia: "Uát táim is dâ pâ-rêid?", wrong: ["Onde é o banheiro?", "Quanto custa o ingresso?"] },
-            { en: "Do you have this in a bigger size?", pt: "Você tem isso em um tamanho maior?", pronuncia: "Dú iú hév dês ín a bí-guâr sáiz?", wrong: ["Onde é o provador?", "Isso é muito caro."] },
-            { en: "Where is the ride-share pickup?", pt: "Onde é o ponto de Uber/aplicativo?", pronuncia: "Uér is dâ ráid-xér pí-kâp?", wrong: ["A que horas passa o ônibus?", "Como chamo um táxi?"] },
-            { en: "Is tax included?", pt: "O imposto já está incluído?", pronuncia: "Is téks in-clú-dêd?", wrong: ["Aceita cartão de crédito?", "Posso pagar em dinheiro?"] }
+            { en: "My daughter wants to see Cinderella.", pt: "Minha filha quer ver a Cinderela.", pronuncia: "Mái dór-târ uónts tú sí Sin-dê-ré-la.", wrong: ["Onde compramos os ingressos?", "Nós já tiramos foto ali."] }
         ];
 
-        // 1. DESENHA A TRILHA VERTICAL (Igual à imagem)
+        // ATUALIZA A PORCENTAGEM E O ANEL NO TOPO
+        function atualizarProgressoCabecalho() {
+            document.getElementById('dia-atual-badge').innerText = `Dia ${appState.diaAtual}`;
+            document.getElementById('progress-days').innerText = appState.diaAtual - 1;
+            document.getElementById('streak-counter-top').innerText = appState.diaAtual;
+            
+            // Conta Matemática do Anel
+            const totalDias = 90;
+            const diasFeitos = appState.diaAtual - 1;
+            let porcentagem = Math.floor((diasFeitos / totalDias) * 100);
+            if (porcentagem > 100) porcentagem = 100;
+            
+            document.getElementById('progress-text').innerText = `${porcentagem}%`;
+            
+            const circle = document.getElementById('progress-ring');
+            const circumference = 24 * 2 * Math.PI; // Raio 24
+            const offset = circumference - (porcentagem / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        // DESENHA A TRILHA (LISTA VERTICAL CLARA)
         const trailContainer = document.getElementById('trail-container');
         function renderizarTrilha() {
             trailContainer.innerHTML = ''; 
-            document.getElementById('streak-counter').textContent = appState.diaAtual;
+            atualizarProgressoCabecalho();
             
             for (let i = 1; i <= 90; i++) {
                 const isProva = (i % 4 === 0);
                 const isLast = (i === 90);
                 
-                let iconHtml = '';
-                let borderClass = '';
-                let textClass = '';
-                let statusText = '';
-                let cardClass = '';
-                let lineHtml = '';
-                let onclick = '';
-
-                // Define a cor da linha que conecta ao próximo card
-                let lineColor = 'bg-gray-800'; 
-                if (i < appState.diaAtual) lineColor = 'bg-[var(--green-main)]';
-
-                if (!isLast) {
-                    lineHtml = `<div class="absolute left-6 top-10 bottom-[-20px] w-1 ${lineColor} -z-10"></div>`;
-                }
+                let iconHtml = '', textClass = '', statusText = '', cardClass = '', lineHtml = '', onclick = '';
+                let lineColor = (i < appState.diaAtual) ? 'bg-[var(--green-success)]' : 'bg-gray-200'; 
+                if (!isLast) { lineHtml = `<div class="absolute left-6 top-12 bottom-[-16px] w-[3px] ${lineColor} -z-10"></div>`; }
 
                 if (i < appState.diaAtual) {
                     // CONCLUÍDO
-                    iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--green-main)] flex items-center justify-center shrink-0 z-10"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>`;
-                    cardClass = 'bg-[var(--card-bg)] opacity-70';
-                    textClass = 'text-white';
+                    iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--green-success)] flex items-center justify-center shrink-0 z-10 shadow-md"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg></div>`;
+                    cardClass = 'bg-white opacity-80 border border-gray-100 shadow-sm';
+                    textClass = 'text-[#1E293B]';
                     statusText = 'Concluído';
                 } else if (i === appState.diaAtual) {
                     // ATIVO
                     if (isProva) {
-                        iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--orange-main)] flex items-center justify-center shrink-0 z-10 glow-orange"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>`;
-                        cardClass = 'bg-[var(--card-bg)] border border-[var(--orange-main)] glow-orange-border';
-                        textClass = 'text-white';
-                        statusText = 'Você está quase lá!';
+                        iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--orange-prova)] flex items-center justify-center shrink-0 z-10 shadow-[0_0_15px_rgba(255,149,0,0.5)]"><svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>`;
+                        cardClass = 'bg-[#FFF9F0] border border-[var(--orange-prova)] shadow-[0_4px_20px_rgba(255,149,0,0.15)]';
+                        textClass = 'text-[var(--orange-prova)]';
+                        statusText = 'Mostre o seu valor!';
                     } else {
-                        iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--green-main)] flex items-center justify-center shrink-0 z-10 glow-green"><span class="text-white font-black text-xl">${i}</span></div>`;
-                        cardClass = 'bg-[var(--card-bg)] border border-[var(--green-main)]';
-                        textClass = 'text-white';
-                        statusText = 'Pronto para começar';
+                        iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--primary-blue)] flex items-center justify-center shrink-0 z-10 shadow-[0_0_15px_rgba(0,122,255,0.4)]"><span class="text-white font-black text-xl">${i}</span></div>`;
+                        cardClass = 'bg-[#F4F9FF] border border-[var(--primary-blue)] shadow-[0_4px_20px_rgba(0,122,255,0.15)]';
+                        textClass = 'text-[var(--primary-blue)]';
+                        statusText = 'Pronto para hoje!';
                     }
                     onclick = 'onclick="abrirMenuDoDia()"';
                 } else {
                     // BLOQUEADO
-                    iconHtml = `<div class="w-12 h-12 rounded-full bg-[var(--bg-main)] border-2 border-gray-700 flex items-center justify-center shrink-0 z-10"><span class="text-gray-600 font-bold">${i}</span></div>`;
-                    cardClass = 'bg-[var(--card-bg)] opacity-50';
-                    textClass = 'text-gray-500';
-                    statusText = 'Bloqueado';
+                    iconHtml = `<div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center shrink-0 z-10"><svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg></div>`;
+                    cardClass = 'bg-white opacity-50 border border-gray-100 shadow-sm';
+                    textClass = 'text-gray-400';
+                    statusText = 'Em breve...';
                 }
 
                 let tituloDia = isProva ? 'Dia de Prova' : `Dia ${i}`;
+                let arrowColor = (i < appState.diaAtual) ? 'text-gray-300' : (i === appState.diaAtual ? (isProva ? 'text-[var(--orange-prova)]' : 'text-[var(--primary-blue)]') : 'hidden');
                 
                 let btnHtml = `
                 <div class="relative flex items-center mb-4 w-full cursor-pointer active:scale-[0.98] transition-transform" ${onclick} id="${i === appState.diaAtual ? 'dia-ativo' : ''}">
                     ${lineHtml}
                     ${iconHtml}
-                    <div class="ml-4 flex-1 ${cardClass} rounded-2xl p-4 flex justify-between items-center shadow-lg transition-all">
+                    <div class="ml-4 flex-1 ${cardClass} rounded-2xl p-4 flex justify-between items-center transition-all">
                         <div>
-                            <h3 class="font-bold ${textClass} text-lg">${tituloDia}</h3>
-                            <p class="text-sm ${i < appState.diaAtual ? 'text-[var(--green-main)]' : (i === appState.diaAtual && isProva ? 'text-[var(--orange-main)]' : 'text-[var(--text-muted)]')}">${statusText}</p>
+                            <h3 class="font-black ${textClass} text-lg leading-none">${tituloDia}</h3>
+                            <p class="text-xs mt-1 font-bold ${i < appState.diaAtual ? 'text-[var(--green-success)]' : (i === appState.diaAtual ? (isProva ? 'text-orange-600' : 'text-blue-600') : 'text-gray-400')}">${statusText}</p>
                         </div>
-                        ${i === appState.diaAtual ? `<svg class="w-5 h-5 text-[var(--orange-main)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>` : ''}
+                        <svg class="w-6 h-6 ${arrowColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                     </div>
                 </div>`;
                 
                 trailContainer.insertAdjacentHTML('beforeend', btnHtml);
             }
-            setTimeout(() => { const el = document.getElementById('dia-ativo'); if(el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
+            // Animação de scroll e do anel de progresso
+            setTimeout(() => { 
+                const el = document.getElementById('dia-ativo'); 
+                if(el) {
+                    const offset = el.offsetTop - 180; // Ajuste para não ficar em baixo do cabeçalho fixo
+                    document.getElementById('scroll-area').scrollTo({ top: offset, behavior: 'smooth' });
+                }
+            }, 300);
         }
 
-        // 2. CONFIGURA O FIREBASE
+        // 2. FIREBASE E CRONÔMETRO
         try {
             const firebaseConfig = {
                 apiKey: "AIzaSyCoPDNQzzka-c65080QzZCarpK7__kFZwQ",
@@ -330,7 +372,6 @@
                 messagingSenderId: "91212411474",
                 appId: "1:91212411474:web:7a7a1a41eb2c09f522658b"
             };
-            
             const app = initializeApp(firebaseConfig);
             dbRef = getFirestore(app);
             userRef = doc(dbRef, 'users', 'admin');
@@ -341,11 +382,8 @@
             if(!userRef) return;
             try {
                 const snap = await getDoc(userRef);
-                if (snap.exists()) {
-                    appState = Object.assign(appState, snap.data());
-                } else {
-                    await setDoc(userRef, appState);
-                }
+                if (snap.exists()) { appState = Object.assign(appState, snap.data()); } 
+                else { await setDoc(userRef, appState); }
                 iniciarCronometro();
                 renderizarTrilha();
             } catch(e) { console.error(e); renderizarTrilha(); }
@@ -357,7 +395,6 @@
             catch(e) { console.error(e); }
         }
 
-        // 3. CRONÔMETRO DE 24 HORAS
         let intervaloCronometro;
         function iniciarCronometro() {
             clearInterval(intervaloCronometro);
@@ -370,7 +407,6 @@
 
             intervaloCronometro = setInterval(() => {
                 if(!appState.last_study_date) return;
-                
                 const limite = new Date(appState.last_study_date).getTime() + (24 * 60 * 60 * 1000);
                 const agora = new Date().getTime();
                 const diff = limite - agora;
@@ -394,7 +430,7 @@
             }, 1000);
         }
 
-        // 4. LÓGICA DE TELAS E CLIQUES
+        // LÓGICA DE MENUS E RESET
         window.abrirConfiguracoes = () => {
             const menu = document.getElementById('settings-menu');
             const sidebar = document.getElementById('settings-sidebar');
@@ -415,7 +451,7 @@
             if(confirm("Voltar para o Dia 1 e reiniciar todo o progresso?")) {
                 appState.diaAtual = 1; 
                 appState.tarefasFeitasHoje = { ex1: false, ex2: false };
-                appState.last_study_date = null; // Zera o timer
+                appState.last_study_date = null;
                 await salvarProgressoNuvem(); 
                 location.reload();
             }
@@ -433,40 +469,38 @@
             fecharTelaBase('flashcard-screen');
             fecharTelaBase('quiz-screen');
             fecharTelaBase('streak-screen');
-            setTimeout(() => { const el = document.getElementById('dia-ativo'); if(el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 100);
         };
 
         window.abrirMenuDoDia = () => {
             const isProva = (appState.diaAtual % 4 === 0);
             document.getElementById('menu-title').innerText = isProva ? `Prova: Dia ${appState.diaAtual}` : `Tarefas: Dia ${appState.diaAtual}`;
-            
             const container = document.getElementById('menu-tasks-container');
             container.innerHTML = '';
 
             if (isProva) {
                 container.innerHTML = `
-                    <button id="btn-ex1" onclick="iniciarExercicio('prova')" class="w-full bg-[var(--card-bg)] border border-[var(--orange-main)] glow-orange-border p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1">
+                    <button id="btn-ex1" onclick="iniciarExercicio('prova')" class="w-full bg-white border border-[var(--orange-prova)] shadow-[0_4px_15px_rgba(255,149,0,0.15)] p-4 rounded-2xl flex items-center justify-between transition-all active:scale-[0.98]">
                         <div class="flex items-center space-x-4">
-                            <div class="bg-orange-500 p-3 rounded-xl text-xl">⭐</div>
-                            <div class="text-left"><h3 class="font-bold text-white">Prova de Revisão (20)</h3><p class="text-xs text-[var(--text-muted)]">Teste seus conhecimentos</p></div>
+                            <div class="bg-orange-100 text-orange-500 p-3 rounded-xl text-2xl">⭐</div>
+                            <div class="text-left"><h3 class="font-black text-[#1E293B]">Prova de Revisão</h3><p class="text-xs font-bold text-gray-400">20 questões</p></div>
                         </div>
-                        <div id="status-ex1" class="text-[var(--orange-main)] font-bold">COMEÇAR</div>
+                        <div id="status-ex1" class="text-[var(--orange-prova)] font-black text-sm uppercase">Começar</div>
                     </button>`;
             } else {
                 container.innerHTML = `
-                    <button id="btn-ex1" onclick="iniciarExercicio('flashcards')" class="w-full bg-[var(--card-bg)] border-2 border-gray-800 p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 mb-4 shadow-md">
+                    <button id="btn-ex1" onclick="iniciarExercicio('flashcards')" class="w-full bg-white border border-gray-100 shadow-sm p-4 rounded-2xl flex items-center justify-between transition-all active:scale-[0.98] mb-4">
                         <div class="flex items-center space-x-4">
-                            <div class="bg-[var(--blue-main)] p-3 rounded-xl text-xl">🗣️</div>
-                            <div class="text-left"><h3 class="font-bold text-white">1. Cards com Áudio (10)</h3><p class="text-xs text-[var(--text-muted)]">Treine a leitura e fala</p></div>
+                            <div class="bg-blue-50 text-[var(--primary-blue)] p-3 rounded-xl text-2xl">🗣️</div>
+                            <div class="text-left"><h3 class="font-black text-[#1E293B]">Cards com Áudio</h3><p class="text-xs font-bold text-gray-400">10 frases</p></div>
                         </div>
-                        <div id="status-ex1" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+                        <div id="status-ex1" class="text-[var(--primary-blue)] font-black text-sm uppercase">Começar</div>
                     </button>
-                    <button id="btn-ex2" onclick="iniciarExercicio('quiz')" class="w-full bg-[var(--card-bg)] border-2 border-gray-800 p-4 rounded-2xl flex items-center justify-between transition-all active:translate-y-1 shadow-md">
+                    <button id="btn-ex2" onclick="iniciarExercicio('quiz')" class="w-full bg-white border border-gray-100 shadow-sm p-4 rounded-2xl flex items-center justify-between transition-all active:scale-[0.98]">
                         <div class="flex items-center space-x-4">
-                            <div class="bg-purple-500 p-3 rounded-xl text-xl">🧠</div>
-                            <div class="text-left"><h3 class="font-bold text-white">2. Múltipla Escolha (10)</h3><p class="text-xs text-[var(--text-muted)]">Qual o significado?</p></div>
+                            <div class="bg-purple-50 text-purple-500 p-3 rounded-xl text-2xl">🧠</div>
+                            <div class="text-left"><h3 class="font-black text-[#1E293B]">Múltipla Escolha</h3><p class="text-xs font-bold text-gray-400">10 perguntas</p></div>
                         </div>
-                        <div id="status-ex2" class="text-[var(--green-main)] font-bold">COMEÇAR</div>
+                        <div id="status-ex2" class="text-[var(--primary-blue)] font-black text-sm uppercase">Começar</div>
                     </button>`;
             }
 
@@ -479,24 +513,23 @@
         function atualizarBotoesMenu(isProva) {
             const btnEx1 = document.getElementById('btn-ex1'), statusEx1 = document.getElementById('status-ex1');
             if (appState.tarefasFeitasHoje.ex1) {
-                btnEx1.className = "w-full bg-[var(--bg-main)] border-2 border-gray-800 p-4 rounded-2xl flex items-center justify-between transition-all opacity-50";
-                statusEx1.innerHTML = `<svg class="w-8 h-8 text-[var(--green-main)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+                btnEx1.className = "w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl flex items-center justify-between transition-all opacity-60";
+                statusEx1.innerHTML = `<svg class="w-6 h-6 text-[var(--green-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>`;
             }
             if (!isProva) {
                 const btnEx2 = document.getElementById('btn-ex2'), statusEx2 = document.getElementById('status-ex2');
                 if (appState.tarefasFeitasHoje.ex2) {
-                    btnEx2.className = "w-full bg-[var(--bg-main)] border-2 border-gray-800 p-4 rounded-2xl flex items-center justify-between transition-all opacity-50 mt-4";
-                    statusEx2.innerHTML = `<svg class="w-8 h-8 text-[var(--green-main)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+                    btnEx2.className = "w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl flex items-center justify-between transition-all opacity-60 mt-4";
+                    statusEx2.innerHTML = `<svg class="w-6 h-6 text-[var(--green-success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>`;
                 }
             }
-
             const btnConcluir = document.getElementById('btn-concluir-dia');
             const diaConcluido = isProva ? appState.tarefasFeitasHoje.ex1 : (appState.tarefasFeitasHoje.ex1 && appState.tarefasFeitasHoje.ex2);
 
             if (diaConcluido) {
-                btnConcluir.className = "w-full bg-[var(--green-main)] text-white rounded-2xl py-4 font-extrabold text-lg uppercase tracking-wider transition-all active:scale-95 shadow-lg glow-green";
+                btnConcluir.className = "w-full bg-[var(--green-success)] text-white rounded-2xl py-4 font-black text-lg uppercase tracking-widest transition-all active:scale-95 shadow-[0_5px_15px_rgba(34,197,94,0.3)]";
             } else {
-                btnConcluir.className = "w-full bg-[var(--bg-main)] text-gray-500 border-2 border-gray-800 rounded-2xl py-4 font-extrabold text-lg uppercase tracking-wider transition-all pointer-events-none";
+                btnConcluir.className = "w-full bg-gray-100 text-gray-400 rounded-2xl py-4 font-black text-lg uppercase tracking-widest transition-all pointer-events-none";
             }
         }
 
@@ -504,7 +537,6 @@
             appState.diaAtual++;
             appState.tarefasFeitasHoje = { ex1: false, ex2: false };
             appState.last_study_date = new Date().toISOString(); 
-            
             await salvarProgressoNuvem();
             iniciarCronometro(); 
             fecharTelaBase('daily-menu');
@@ -512,7 +544,7 @@
             setTimeout(() => { window.abrirTelaOfensiva(); }, 400);
         };
 
-        // 5. EXERCÍCIOS
+        // EXERCÍCIOS
         let licaoAtual = [], indexAtual = 0, totalItems = 10;
         
         function gerarVocabularioDoDia(dia, qtd) {
@@ -548,7 +580,6 @@
             }
         };
 
-        // --- FLASHCARD ---
         let cardVirado = false, startX = 0, currentTranslate = 0, isDragging = false;
         const flashcard = document.getElementById('flashcard');
 
@@ -557,10 +588,8 @@
             document.getElementById('fc-frente').innerText = licaoAtual[indexAtual].pt;
             document.getElementById('fc-verso').innerText = `"${licaoAtual[indexAtual].en}"`;
             document.getElementById('fc-pronuncia').innerText = licaoAtual[indexAtual].pronuncia;
-            
             document.getElementById('card-front').classList.remove('hidden');
             document.getElementById('card-back').classList.add('hidden');
-            
             flashcard.style.transform = `translateX(0px) rotate(0deg)`;
             flashcard.classList.remove('card-drag-right', 'card-drag-left');
             cardVirado = false;
@@ -576,62 +605,36 @@
             }
         };
 
-        flashcard.addEventListener('touchstart', (e) => { 
-            if (!cardVirado) return; 
-            startX = e.touches[0].clientX; 
-            isDragging = true; 
-            flashcard.style.transition = 'none'; 
-        });
-
+        flashcard.addEventListener('touchstart', (e) => { if (!cardVirado) return; startX = e.touches[0].clientX; isDragging = true; flashcard.style.transition = 'none'; });
         flashcard.addEventListener('touchmove', (e) => { 
             if (!isDragging || !cardVirado) return; 
             currentTranslate = e.touches[0].clientX - startX; 
             flashcard.style.transform = `translateX(${currentTranslate}px) rotate(${currentTranslate * 0.05}deg)`; 
-            
-            if (currentTranslate > 60) {
-                flashcard.classList.add('card-drag-right');
-                flashcard.classList.remove('card-drag-left');
-            } else if (currentTranslate < -60) {
-                flashcard.classList.add('card-drag-left');
-                flashcard.classList.remove('card-drag-right');
-            } else {
-                flashcard.classList.remove('card-drag-right', 'card-drag-left');
-            }
+            if (currentTranslate > 60) { flashcard.classList.add('card-drag-right'); flashcard.classList.remove('card-drag-left'); } 
+            else if (currentTranslate < -60) { flashcard.classList.add('card-drag-left'); flashcard.classList.remove('card-drag-right'); } 
+            else { flashcard.classList.remove('card-drag-right', 'card-drag-left'); }
         });
-
         flashcard.addEventListener('touchend', () => {
-            if (!isDragging || !cardVirado) return; 
-            isDragging = false; 
+            if (!isDragging || !cardVirado) return; isDragging = false; 
             flashcard.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease-out';
             if (currentTranslate > 90) window.processarCard('facil');
             else if (currentTranslate < -90) window.processarCard('errei');
-            else {
-                flashcard.style.transform = `translateX(0px) rotate(0deg)`;
-                flashcard.classList.remove('card-drag-right', 'card-drag-left');
-            }
+            else { flashcard.style.transform = `translateX(0px) rotate(0deg)`; flashcard.classList.remove('card-drag-right', 'card-drag-left'); }
         });
 
         window.processarCard = async (acao) => {
             if(acao === 'facil') flashcard.style.transform = `translateX(400px) rotate(20deg)`;
             else flashcard.style.transform = `translateX(-400px) rotate(-20deg)`;
             flashcard.style.opacity = '0';
-            flashcard.classList.remove('card-drag-right', 'card-drag-left');
-            
             setTimeout(async () => {
                 indexAtual++;
                 if (indexAtual >= totalItems) {
-                    appState.tarefasFeitasHoje.ex1 = true; 
-                    await salvarProgressoNuvem();
-                    fecharTelaBase('flashcard-screen'); 
-                    window.abrirMenuDoDia();
-                } else {
-                    renderizarFlashcard();
-                    flashcard.style.opacity = '1';
-                }
+                    appState.tarefasFeitasHoje.ex1 = true; await salvarProgressoNuvem();
+                    fecharTelaBase('flashcard-screen'); window.abrirMenuDoDia();
+                } else { renderizarFlashcard(); flashcard.style.opacity = '1'; }
             }, 300);
         };
 
-        // --- QUIZ LAYOUT ---
         function renderizarQuiz() {
             document.getElementById('quiz-counter').innerText = `${indexAtual + 1}/${totalItems}`;
             const item = licaoAtual[indexAtual];
@@ -643,7 +646,7 @@
             opcoes.forEach(opcao => {
                 const isCorreta = opcao === item.pt;
                 const btn = document.createElement('button');
-                btn.className = "w-full bg-[var(--card-bg)] border-2 border-gray-800 hover:border-gray-600 p-5 rounded-2xl text-white font-semibold text-lg active:scale-95 transition-all text-left shadow-lg";
+                btn.className = "w-full bg-white border-2 border-gray-100 hover:border-gray-300 p-5 rounded-2xl text-[#1E293B] font-black text-lg active:scale-[0.98] transition-all text-left shadow-sm";
                 btn.innerText = opcao; 
                 btn.onclick = () => processarRespostaQuiz(btn, isCorreta);
                 container.appendChild(btn);
@@ -655,39 +658,30 @@
             todosBotoes.forEach(b => b.style.pointerEvents = 'none');
             
             if (isCorreta) {
-                botao.classList.replace('bg-[var(--card-bg)]', 'bg-[var(--green-main)]');
-                botao.classList.replace('border-gray-800', 'border-[var(--green-main)]');
-                botao.classList.replace('hover:border-gray-600', 'border-[var(--green-main)]');
-                
+                botao.classList.replace('bg-white', 'bg-green-50');
+                botao.classList.replace('border-gray-100', 'border-[var(--green-success)]');
+                botao.classList.replace('text-[#1E293B]', 'text-[var(--green-success)]');
                 setTimeout(async () => {
                     indexAtual++;
                     if (indexAtual >= totalItems) {
                         const isProva = (appState.diaAtual % 4 === 0);
-                        if (isProva) appState.tarefasFeitasHoje.ex1 = true;
-                        else appState.tarefasFeitasHoje.ex2 = true;
-                        
-                        await salvarProgressoNuvem();
-                        fecharTelaBase('quiz-screen'); 
-                        window.abrirMenuDoDia();
-                    } else {
-                        renderizarQuiz();
-                    }
+                        if (isProva) appState.tarefasFeitasHoje.ex1 = true; else appState.tarefasFeitasHoje.ex2 = true;
+                        await salvarProgressoNuvem(); fecharTelaBase('quiz-screen'); window.abrirMenuDoDia();
+                    } else { renderizarQuiz(); }
                 }, 800);
             } else {
-                botao.classList.replace('bg-[var(--card-bg)]', 'bg-red-500');
-                botao.classList.replace('border-gray-800', 'border-red-700');
-                botao.classList.replace('hover:border-gray-600', 'border-red-700');
-                
+                botao.classList.replace('bg-white', 'bg-red-50');
+                botao.classList.replace('border-gray-100', 'border-red-500');
+                botao.classList.replace('text-[#1E293B]', 'text-red-600');
                 setTimeout(() => {
-                    botao.classList.replace('bg-red-500', 'bg-[var(--card-bg)]');
-                    botao.classList.replace('border-red-700', 'border-gray-800');
-                    botao.classList.replace('hover:border-gray-600', 'border-gray-800');
+                    botao.classList.replace('bg-red-50', 'bg-white');
+                    botao.classList.replace('border-red-500', 'border-gray-100');
+                    botao.classList.replace('text-red-600', 'text-[#1E293B]');
                     todosBotoes.forEach(b => b.style.pointerEvents = 'auto');
                 }, 1000);
             }
         }
 
-        // UTILITÁRIOS
         window.fecharTela = (id) => fecharTelaBase(id);
         function fecharTelaBase(id) {
             const el = document.getElementById(id);
@@ -696,7 +690,6 @@
             el.classList.replace('opacity-100', 'opacity-0');
             el.classList.replace('pointer-events-auto', 'pointer-events-none');
         }
-
     </script>
 </body>
 </html>
